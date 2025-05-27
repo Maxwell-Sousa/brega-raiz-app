@@ -1,225 +1,455 @@
 
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Music, User, Sparkles } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, Music, User, MapPin, PlayCircle, ExternalLink, Heart, Sparkles, Mic2, Radio } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const Historia = () => {
-  const decades = [
-    { period: "Final dos anos 1960", active: true },
-    { period: "Década de 1970", active: false },
-    { period: "Década de 1980", active: false },
-    { period: "Década de 1990", active: false },
-    { period: "Década de 2000", active: false },
-    { period: "Década de 2010", active: false },
-    { period: "Década de 2020", active: false },
+export default function HistoriaPage() {
+  const [selectedEra, setSelectedEra] = useState("origem");
+
+  const eras = {
+    origem: {
+      title: "Origens (1960s)",
+      period: "Final dos anos 1960",
+      description: "O nascimento de uma expressão musical que mudaria para sempre a cultura brasileira",
+      content: `O brega nasceu no Brasil no final da década de 1960, em um período de intensa transformação social, política e cultural. Durante a Ditadura Militar, a industrialização acelerada e o êxodo rural, surgiu esta expressão musical das camadas populares.
+
+      O termo "brega" inicialmente era uma gíria pejorativa, associada a locais populares de baixa renda como cabarés e boates. Ironicamente, foi justamente nestes espaços que nasceu um dos gêneros mais autênticos da música brasileira.
+
+      Caracterizado por letras simples e diretas sobre amor, traição, dor e saudade, o brega trazia melodias marcantes e sentimentais, com forte influência da música romântica latino-americana e do bolero.`,
+      artists: ["Nelson Ned", "Reginaldo Rossi", "Waldick Soriano"],
+      landmarks: [
+        "Surgimento nos cabarés e boates populares",
+        "Primeira geração de artistas bregas",
+        "Influência do bolero e música romântica latina"
+      ]
+    },
+    consolidacao: {
+      title: "Consolidação (1970s)",
+      period: "Década de 1970",
+      description: "O brega se espalha pelo Brasil e conquista seu público fiel",
+      content: `Os anos 1970 marcaram a consolidação do brega como estilo popular. Apesar da resistência da elite cultural, o gênero conquistou rádios, feiras, festas de interior e grandes públicos, especialmente no Nordeste e Centro-Oeste.
+
+      A evolução musical trouxe arranjos mais elaborados com teclados, metais e guitarras, misturando elementos do sertanejo, jovem guarda e música romântica internacional. O brega começou a desenvolver sua identidade visual única, com performances dramáticas e figurinos exuberantes.
+
+      Mesmo com o estigma social - o termo "brega" ainda associado ao "cafona" e "kitsch" - o público popular abraçava e legitimava o estilo, criando uma base sólida para sua expansão.`,
+      artists: ["Reginaldo Rossi", "Agnaldo Timóteo", "Carlos Alexandre"],
+      landmarks: [
+        "Popularização nacional do gênero",
+        "Sucesso de 'Garçom' e 'A Raposa e as Uvas'",
+        "Desenvolvimento da estética visual brega"
+      ]
+    },
+    midia: {
+      title: "Era da Mídia (1980s)",
+      period: "Década de 1980",
+      description: "O brega conquista rádio e TV, consolidando a estética da dor popular",
+      content: `Os anos 1980 marcaram a ampliação midiática do brega, que passou a frequentar programas de auditório e rádio. Houve um fortalecimento significativo dos artistas regionais, especialmente no Norte e Nordeste.
+
+      Musicalmente, o período viu o uso cada vez maior de teclados eletrônicos e sintetizadores, antecipando as transformações que viriam. As letras continuaram centradas em amor, traição, ciúmes e sofrimento, consolidando a "estética da dor popular" como marca registrada do gênero.
+
+      A década estabeleceu o brega como um fenômeno cultural genuinamente brasileiro, com artistas vendendo milhões de discos e lotando shows por todo o país.`,
+      artists: ["Amado Batista", "Régis Danese", "Paulo Sérgio", "Carlos André"],
+      landmarks: [
+        "Presença em programas de TV e rádio",
+        "Uso de sintetizadores e teclados eletrônicos",
+        "Consolidação da temática romântica-dramática"
+      ]
+    },
+    modernizacao: {
+      title: "Modernização (1990s)",
+      period: "Década de 1990",
+      description: "Surgem novas vertentes e o brega se transforma",
+      content: `Os anos 1990 trouxeram transformações revolucionárias ao brega. Surgiu o brega eletrônico e nasceu o "brega das aparelhagens" no Norte do Brasil, especialmente no Pará. As grandes aparelhagens de som como "Super Pop" e "Treme-Treme" começaram a transformar o brega em música de festa.
+
+      Emergiu também o brega calypso, uma mistura inovadora de brega com guitarradas, carimbó e batidas eletrônicas. A Banda Calypso, formada em 1999, tornou-se um dos maiores símbolos dessa nova fase, alcançando enorme sucesso nacional e redefinindo os limites do gênero.
+
+      Esta década marcou a transição do brega de música de sofrimento para música de celebração, mantendo sua essência popular mas expandindo suas possibilidades expressivas.`,
+      artists: ["Banda Calypso", "Aparelhagens do Pará", "Artistas do brega eletrônico"],
+      landmarks: [
+        "Nascimento do brega eletrônico",
+        "Surgimento das aparelhagens no Pará",
+        "Criação da Banda Calypso"
+      ]
+    },
+    tecnobrega: {
+      title: "Tecnobrega (2000s)",
+      period: "Década de 2000",
+      description: "A revolução digital e a autonomia criativa",
+      content: `Os anos 2000 marcaram uma revolução com o surgimento do tecnobrega em Belém do Pará, especialmente no bairro da Terra Firme. Esta nova vertente misturou elementos eletrônicos com batidas dançantes do brega tradicional, sendo produzida principalmente por DJs e MCs locais.
+
+      O tecnobrega revolucionou a indústria musical com sua autonomia na produção, distribuição independente em camelôs e feiras, e shows gigantescos, gratuitos ou com preços acessíveis. Criou um novo modelo de negócio musical totalmente independente.
+
+      Gaby Amarantos, a "Beyoncé do Pará", levou o tecnobrega à projeção nacional com hits como "Xirley" e "Ex Mai Love", provando que o brega poderia conquistar qualquer público, de qualquer classe social.`,
+      artists: ["Gaby Amarantos", "DJ Waldo Squash", "Gang do Eletro"],
+      landmarks: [
+        "Surgimento em Belém do Pará",
+        "Modelo de distribuição independente",
+        "Projeção nacional com Gaby Amarantos"
+      ]
+    },
+    bregafunk: {
+      title: "Brega Funk (2010s)",
+      period: "Década de 2010",
+      description: "O estouro nacional e a conquista das redes sociais",
+      content: `A década de 2010 trouxe o brega funk, surgido no Recife como uma fusão explosiva entre o brega, o funk carioca e a música eletrônica. Fortemente associado à cultura periférica e às danças virais, o brega funk conquistou as redes sociais.
+
+      Com letras mais ousadas e irreverentes, batidas sincopadas e rápidas, o brega funk criou uma estética própria focada no rebolado e na dança. Tornou-se um fenômeno viral, influenciando até o funk paulista e carioca.
+
+      Esta vertente levou o brega ao mainstream nacional e internacional, mostrando a capacidade infinita de reinvenção do gênero e sua relevância na cultura pop contemporânea.`,
+      artists: ["Shevchenko e Elloco", "MC Elvis", "MC Troinha", "Brega Bregoso"],
+      landmarks: [
+        "Surgimento em Recife",
+        "Fenômeno viral nas redes sociais",
+        "Influência no funk nacional"
+      ]
+    },
+    mainstream: {
+      title: "Mainstream (2020s)",
+      period: "Década de 2020",
+      description: "Reconhecimento cultural e conquista definitiva",
+      content: `Os anos 2020 marcaram a consagração definitiva do brega. Da marginalização inicial ao palco do mainstream, o gênero conquistou grandes festivais como Rock in Rio, foi incluído em novelas, séries e playlists internacionais.
+
+      O reconhecimento acadêmico e cultural veio através de teses, livros e documentários sobre o brega e sua importância social. Artistas contemporâneos de diversos gêneros passaram a homenagear o brega em shows e parcerias.
+
+      Hoje, o brega é considerado um dos movimentos musicais mais importantes do Brasil, reconhecido como patrimônio cultural vivo e símbolo de resistência popular. Representa não apenas um gênero musical, mas uma expressão social, afetiva e cultural das camadas populares brasileiras.`,
+      artists: ["Nova geração de artistas bregas", "Colaborações mainstream", "Artistas contemporâneos"],
+      landmarks: [
+        "Participação em grandes festivais",
+        "Reconhecimento acadêmico",
+        "Patrimônio cultural brasileiro"
+      ]
+    }
+  };
+
+  const famousArtists = [
+    {
+      name: "Reginaldo Rossi",
+      nickname: "Rei do Brega",
+      period: "1970s-2000s",
+      bio: "Considerado o maior nome do brega brasileiro, eternizou clássicos como 'Garçom' e 'A Raposa e as Uvas'",
+      hit: "Garçom",
+      significance: "Definiu a estética e a temática clássica do brega romântico"
+    },
+    {
+      name: "Waldick Soriano",
+      nickname: "Príncipe do Brega",
+      period: "1960s-1980s",
+      bio: "Pioneiro do gênero, conhecido por suas letras melancólicas sobre traição e sofrimento",
+      hit: "Eu Não Sou Cachorro, Não",
+      significance: "Estabeleceu a temática da dor amorosa como marca do brega"
+    },
+    {
+      name: "Gaby Amarantos",
+      nickname: "Beyoncé do Pará",
+      period: "2000s-presente",
+      bio: "Revolucionou o tecnobrega e levou o gênero à projeção nacional e internacional",
+      hit: "Xirley",
+      significance: "Modernizou o brega e o levou ao mainstream nacional"
+    },
+    {
+      name: "Nelson Ned",
+      nickname: "Rouxinol das Américas",
+      period: "1960s-1990s",
+      bio: "Um dos primeiros artistas rotulados como brega, com sua potente voz romântica",
+      hit: "Tudo Passará",
+      significance: "Pioneiro na consolidação do brega como gênero musical"
+    }
   ];
 
-  const artists = [
-    { name: "Nelson Ned", nickname: "Rouxinol das Américas" },
-    { name: "Reginaldo Rossi", nickname: "Rei do Brega" },
-    { name: "Waldick Soriano", nickname: "Príncipe do Brega" },
-  ];
-
-  const themes = [
-    "Amor e desamor como experiências universais",
-    "Traição e ciúmes como dramas cotidianos",
-    "Saudades e nostalgia romântica",
-    "Bebedeiras em bares ('Garçom' como hino)",
-    "O sofrimento como estética popular"
-  ];
-
-  const visualAesthetics = [
-    "Figurinos exagerados e brilhantes",
-    "Lantejoulas e elementos cênicos",
-    "Performances dramáticas e teatrais",
-    "Cenários exuberantes nos shows",
-    "Gestual expressivo e emocional"
-  ];
-
-  const culturalResistance = [
-    "Representa a cultura popular periférica",
-    "Sempre esteve à margem da 'música oficial'",
-    "Manteve público fiel através das décadas",
-    "Símbolo de orgulho e resistência cultural",
-    "Expressão autêntica das camadas populares"
-  ];
+  const culturalImpact = {
+    themes: [
+      "Amor e desamor como experiências universais",
+      "Traição e ciúmes como dramas cotidianos", 
+      "Saudades e nostalgia romântica",
+      "Bebedeiras em bares ('Garçom' como hino)",
+      "O sofrimento como estética popular"
+    ],
+    aesthetics: [
+      "Figurinos exagerados e brilhantes",
+      "Lantejoulas e elementos cênicos",
+      "Performances dramáticas e teatrais",
+      "Cenários exuberantes nos shows",
+      "Gestual expressivo e emocional"
+    ],
+    resistance: [
+      "Representa a cultura popular periférica",
+      "Sempre esteve à margem da 'música oficial'",
+      "Manteve público fiel através das décadas",
+      "Símbolo de orgulho e resistência cultural",
+      "Expressão autêntica das camadas populares"
+    ]
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white p-6">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <div className="flex justify-center mb-4">
-          <div className="w-16 h-16 bg-gradient-to-r from-red-600 to-orange-500 rounded-full flex items-center justify-center">
-            <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
-              <span className="text-orange-800 text-sm">★</span>
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <div className="flex justify-center mb-6">
+            <div className="relative">
+              <div className="w-20 h-20 bg-gradient-to-r from-red-800 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl">
+                <Music className="w-10 h-10 text-white" />
+              </div>
+              <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-black" />
+              </div>
             </div>
           </div>
-        </div>
-        
-        <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent">
-          História do Brega
-        </h1>
-        <p className="text-xl text-gray-300 max-w-4xl mx-auto">
-          Uma jornada completa pela trajetória do gênero musical que conquistou o coração brasileiro, da marginalização ao reconhecimento como patrimônio cultural
-        </p>
-      </div>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">
+            <span className="bg-gradient-to-r from-red-600 to-yellow-500 bg-clip-text text-transparent">
+              História do Brega
+            </span>
+          </h1>
+          <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
+            Uma jornada completa pela trajetória do gênero musical que conquistou o coração brasileiro, 
+            da marginalização ao reconhecimento como patrimônio cultural
+          </p>
+        </motion.div>
 
-      {/* Timeline */}
-      <div className="mb-12">
-        <div className="flex flex-wrap gap-3 justify-center mb-8">
-          {decades.map((decade, index) => (
+        {/* Timeline Navigation */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="flex flex-wrap justify-center gap-3 mb-12"
+        >
+          {Object.entries(eras).map(([key, era]) => (
             <Button
-              key={index}
-              variant={decade.active ? "default" : "outline"}
-              className={decade.active 
-                ? "bg-red-600 hover:bg-red-700 text-white border-none" 
-                : "border-gray-600 text-gray-300 hover:bg-gray-800"
-              }
+              key={key}
+              onClick={() => setSelectedEra(key)}
+              variant={selectedEra === key ? "default" : "outline"}
+              className={`px-4 py-3 text-sm font-medium transition-all duration-300 ${
+                selectedEra === key 
+                  ? 'bg-gradient-to-r from-red-600 to-yellow-600 text-white shadow-lg' 
+                  : 'border-gray-700 hover:border-red-600 hover:bg-red-600/10'
+              }`}
             >
               <Calendar className="w-4 h-4 mr-2" />
-              {decade.period}
+              {era.period}
             </Button>
           ))}
-        </div>
-      </div>
+        </motion.div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Origins Section */}
-          <div className="lg:col-span-2">
-            <Card className="bg-gray-800/50 border-gray-700 mb-8">
-              <CardContent className="p-8">
-                <div className="flex items-center gap-3 mb-6">
-                  <Music className="w-8 h-8 text-yellow-400" />
-                  <h2 className="text-3xl font-bold text-yellow-400">Origens (1960s)</h2>
-                </div>
-                
-                <div className="space-y-4 text-gray-300">
-                  <p>
-                    O brega nasceu no Brasil no final da década de 1960, em um período de intensa transformação social, política e cultural. Durante a Ditadura Militar, a industrialização acelerada e o êxodo rural, surgiu esta expressão musical das camadas populares.
-                  </p>
-                  
-                  <p>
-                    O termo "brega" inicialmente era uma gíria pejorativa, associada a locais populares de baixa renda como cabarés e boates. Ironicamente, foi justamente nestes espaços que nasceu um dos gêneros mais autênticos da música brasileira.
-                  </p>
-                  
-                  <p>
-                    Caracterizado por letras simples e diretas sobre amor, traição, dor e saudade, o brega se conectou profundamente com as experiências cotidianas do povo brasileiro, tornando-se trilha sonora de milhões de vidas.
-                  </p>
+        {/* Era Content */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={selectedEra}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.4 }}
+            className="grid lg:grid-cols-2 gap-8 mb-12"
+          >
+            <Card className="bg-black/40 border-gray-800 backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle className="text-2xl text-yellow-400 flex items-center gap-2">
+                  <Music className="w-6 h-6" />
+                  {eras[selectedEra].title}
+                </CardTitle>
+                <Badge variant="outline" className="w-fit border-red-600 text-red-400">
+                  {eras[selectedEra].period}
+                </Badge>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300 leading-relaxed whitespace-pre-line text-sm">
+                  {eras[selectedEra].content}
+                </p>
+              </CardContent>
+            </Card>
+
+            <div className="space-y-6">
+              {/* Artists */}
+              <Card className="bg-black/40 border-gray-800 backdrop-blur-xl">
+                <CardHeader>
+                  <CardTitle className="text-xl text-white flex items-center gap-2">
+                    <User className="w-5 h-5" />
+                    Artistas Principais
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {eras[selectedEra].artists.map((artist, index) => (
+                      <div key={index} className="bg-gray-900/50 p-3 rounded-lg border border-gray-700">
+                        <p className="font-medium text-yellow-400">{artist}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Landmarks */}
+              <Card className="bg-black/40 border-gray-800 backdrop-blur-xl">
+                <CardHeader>
+                  <CardTitle className="text-xl text-white flex items-center gap-2">
+                    <MapPin className="w-5 h-5" />
+                    Marcos Históricos
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {eras[selectedEra].landmarks.map((landmark, index) => (
+                      <div key={index} className="flex items-start gap-3 p-3 bg-red-900/20 rounded-lg border border-red-800/30">
+                        <div className="w-2 h-2 bg-red-500 rounded-full mt-2 shrink-0"></div>
+                        <p className="text-gray-300 text-sm leading-relaxed">{landmark}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Famous Artists Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mb-16"
+        >
+          <h2 className="text-3xl font-bold text-center mb-8">
+            <span className="bg-gradient-to-r from-yellow-500 to-red-600 bg-clip-text text-transparent">
+              Ícones do Brega
+            </span>
+          </h2>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {famousArtists.map((artist, index) => (
+              <motion.div
+                key={artist.name}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 + index * 0.1 }}
+              >
+                <Card className="bg-black/40 border-gray-800 hover:border-red-600/50 transition-all duration-300 hover:scale-105 backdrop-blur-xl group h-full">
+                  <CardContent className="p-6 text-center">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-red-600 to-yellow-600 rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                      <Mic2 className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2">{artist.name}</h3>
+                    <Badge variant="outline" className="border-yellow-600 text-yellow-400 mb-2">
+                      {artist.nickname}
+                    </Badge>
+                    <p className="text-xs text-gray-500 mb-3">{artist.period}</p>
+                    <p className="text-gray-400 text-sm mb-4 leading-relaxed">{artist.bio}</p>
+                    <div className="flex items-center justify-center gap-2 text-red-400 mb-3">
+                      <PlayCircle className="w-4 h-4" />
+                      <span className="text-sm font-medium">{artist.hit}</span>
+                    </div>
+                    <p className="text-xs text-gray-500 italic leading-relaxed">{artist.significance}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Cultural Impact Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="mb-16"
+        >
+          <h2 className="text-3xl font-bold text-center mb-8">
+            <span className="bg-gradient-to-r from-yellow-500 to-red-600 bg-clip-text text-transparent">
+              Impacto Cultural
+            </span>
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="bg-black/40 border-gray-800 backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle className="text-xl text-white flex items-center gap-2">
+                  <Heart className="w-5 h-5 text-red-500" />
+                  Temas Recorrentes
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {culturalImpact.themes.map((theme, index) => (
+                    <div key={index} className="flex items-start gap-3 p-3 bg-red-900/20 rounded-lg border border-red-800/30">
+                      <div className="w-2 h-2 bg-red-500 rounded-full mt-2 shrink-0"></div>
+                      <p className="text-gray-300 text-sm leading-relaxed">{theme}</p>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
-          </div>
 
-          {/* Artists Section */}
-          <div>
-            <Card className="bg-gray-800/50 border-gray-700 mb-8">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <User className="w-6 h-6 text-white" />
-                  <h3 className="text-xl font-bold text-white">Artistas Principais</h3>
+            <Card className="bg-black/40 border-gray-800 backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle className="text-xl text-white flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-yellow-500" />
+                  Estética Visual
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {culturalImpact.aesthetics.map((aesthetic, index) => (
+                    <div key={index} className="flex items-start gap-3 p-3 bg-yellow-900/20 rounded-lg border border-yellow-800/30">
+                      <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2 shrink-0"></div>
+                      <p className="text-gray-300 text-sm leading-relaxed">{aesthetic}</p>
+                    </div>
+                  ))}
                 </div>
-                
-                <div className="space-y-4">
-                  {artists.map((artist, index) => (
-                    <div key={index} className="border-l-4 border-yellow-500 pl-4">
-                      <h4 className="font-semibold text-yellow-400">{artist.name}</h4>
-                      <p className="text-sm text-gray-400">{artist.nickname}</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-black/40 border-gray-800 backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle className="text-xl text-white flex items-center gap-2">
+                  <Radio className="w-5 h-5 text-blue-500" />
+                  Resistência Cultural
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {culturalImpact.resistance.map((resistance, index) => (
+                    <div key={index} className="flex items-start gap-3 p-3 bg-blue-900/20 rounded-lg border border-blue-800/30">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 shrink-0"></div>
+                      <p className="text-gray-300 text-sm leading-relaxed">{resistance}</p>
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Impact Sections */}
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8 mb-12">
-          {/* Recurring Themes */}
-          <Card className="bg-gray-800/50 border-gray-700">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white">♥</span>
-                </div>
-                <h3 className="text-lg font-bold text-red-400">Temas Recorrentes</h3>
-              </div>
-              
-              <div className="space-y-3">
-                {themes.map((theme, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-red-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <p className="text-sm text-gray-300">{theme}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Visual Aesthetics */}
-          <Card className="bg-gray-800/50 border-gray-700">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <Sparkles className="w-8 h-8 text-yellow-400" />
-                <h3 className="text-lg font-bold text-yellow-400">Estética Visual</h3>
-              </div>
-              
-              <div className="space-y-3">
-                {visualAesthetics.map((aesthetic, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <p className="text-sm text-gray-300">{aesthetic}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Cultural Resistance */}
-          <Card className="bg-gray-800/50 border-gray-700">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white">🎵</span>
-                </div>
-                <h3 className="text-lg font-bold text-blue-400">Resistência Cultural</h3>
-              </div>
-              
-              <div className="space-y-3">
-                {culturalResistance.map((resistance, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <p className="text-sm text-gray-300">{resistance}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Legacy Section */}
-        <Card className="bg-gradient-to-r from-red-900/20 via-orange-900/20 to-yellow-900/20 border-orange-700/30">
-          <CardContent className="p-8 text-center">
-            <h2 className="text-3xl font-bold text-yellow-400 mb-6">O Brega como Patrimônio Vivo</h2>
-            <p className="text-xl text-gray-300 mb-4 italic">
-              "O brega não é apenas um gênero musical: é uma expressão social, afetiva e cultural das camadas populares brasileiras. Da dor à festa, do cabaré à internet, o brega soube se reinventar e hoje ocupa o lugar que sempre mereceu: o coração da cultura brasileira."
-            </p>
-            <div className="flex items-center justify-center gap-3 mt-6">
-              <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center">
+        {/* Conclusion Section */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1.0, duration: 0.8 }}
+          className="text-center bg-gradient-to-r from-red-900/20 to-yellow-900/20 rounded-3xl p-12 border border-red-800/30 backdrop-blur-xl"
+        >
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold text-white mb-6">O Brega como Patrimônio Vivo</h2>
+            <blockquote className="text-xl md:text-2xl font-light text-gray-200 mb-6 italic leading-relaxed">
+              "O brega não é apenas um gênero musical: é uma expressão social, afetiva e cultural das camadas populares brasileiras. 
+              Da dor à festa, do cabaré à internet, o brega soube se reinventar e hoje ocupa o lugar que sempre mereceu: 
+              o coração da cultura brasileira."
+            </blockquote>
+            <div className="flex justify-center items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-r from-red-600 to-yellow-600 rounded-full flex items-center justify-center">
                 <Music className="w-6 h-6 text-white" />
               </div>
               <div className="text-left">
-                <p className="text-yellow-400 font-semibold">Legado Cultural Brasileiro</p>
-                <p className="text-gray-400 text-sm">Patrimônio musical do povo</p>
+                <p className="font-semibold text-yellow-400">Legado Cultural Brasileiro</p>
+                <p className="text-sm text-gray-400">Dos cabarés ao mainstream</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
-};
-
-export default Historia;
+}
