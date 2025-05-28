@@ -6,8 +6,18 @@ import { Calendar, Music, User, MapPin, PlayCircle, ExternalLink, Heart, Sparkle
 import { motion, AnimatePresence } from "framer-motion";
 import { HistoriaContent } from "@/entities/HistoriaContent";
 
+// Define proper types for era data
+interface EraData {
+  title: string;
+  period: string;
+  description: string;
+  content: string;
+  artists: string[];
+  landmarks: string[];
+}
+
 // Fallback data in case database is empty
-const fallbackEras = {
+const fallbackEras: Record<string, EraData> = {
   origem: {
     title: "Origens (1960s)",
     period: "Final dos anos 1960",
@@ -28,7 +38,7 @@ Caracterizado por letras simples e diretas sobre amor, traição, dor e saudade,
 
 export default function HistoriaPage() {
   const [selectedEra, setSelectedEra] = useState("origem");
-  const [eras, setEras] = useState({});
+  const [eras, setEras] = useState<Record<string, EraData>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -38,8 +48,8 @@ export default function HistoriaPage() {
         
         if (data && data.length > 0) {
           // Convert array to object with era_key as key
-          const erasObject = {};
-          data.forEach(era => {
+          const erasObject: Record<string, EraData> = {};
+          data.forEach((era: any) => {
             erasObject[era.era_key] = {
               title: era.title,
               period: era.period,
@@ -226,7 +236,7 @@ export default function HistoriaPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {eras[selectedEra].artists.map((artist, index) => (
+                      {eras[selectedEra].artists.map((artist: string, index: number) => (
                         <div key={index} className="bg-gray-900/50 p-3 rounded-lg border border-gray-700">
                           <p className="font-medium text-yellow-400">{artist}</p>
                         </div>
@@ -245,7 +255,7 @@ export default function HistoriaPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {eras[selectedEra].landmarks.map((landmark, index) => (
+                      {eras[selectedEra].landmarks.map((landmark: string, index: number) => (
                         <div key={index} className="flex items-start gap-3 p-3 bg-red-900/20 rounded-lg border border-red-800/30">
                           <div className="w-2 h-2 bg-red-500 rounded-full mt-2 shrink-0"></div>
                           <p className="text-gray-300 text-sm leading-relaxed">{landmark}</p>

@@ -72,6 +72,16 @@ export default function Layout({ children }: LayoutProps) {
             --input: #262626;
             --ring: #631606;
             --radius: 0.75rem;
+            
+            /* Sidebar specific variables */
+            --sidebar-background: #000000;
+            --sidebar-foreground: #ffffff;
+            --sidebar-primary: #631606;
+            --sidebar-primary-foreground: #ffffff;
+            --sidebar-accent: #1a1a1a;
+            --sidebar-accent-foreground: #ffffff;
+            --sidebar-border: #262626;
+            --sidebar-ring: #631606;
           }
           
           body {
@@ -105,8 +115,8 @@ export default function Layout({ children }: LayoutProps) {
         `}
       </style>
       <div className="min-h-screen flex w-full bg-gradient-to-br from-gray-900 via-black to-gray-900">
-        <Sidebar className="border-r border-gray-800 bg-black backdrop-blur-xl">
-          <SidebarHeader className="border-b border-gray-800 p-6">
+        <Sidebar className="border-r border-gray-800 !bg-black backdrop-blur-xl">
+          <SidebarHeader className="border-b border-gray-800 p-6 !bg-black">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 brega-gradient rounded-xl flex items-center justify-center shadow-lg">
                 <Music className="w-6 h-6 text-white" />
@@ -118,7 +128,7 @@ export default function Layout({ children }: LayoutProps) {
             </div>
           </SidebarHeader>
           
-          <SidebarContent className="p-4">
+          <SidebarContent className="p-4 !bg-black">
             <SidebarGroup>
               <SidebarGroupContent>
                 <SidebarMenu>
