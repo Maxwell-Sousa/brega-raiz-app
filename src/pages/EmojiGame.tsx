@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,12 +27,13 @@ export default function DesafioEmojisPage() {
   const [userAnswer, setUserAnswer] = useState("");
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [hintsUsedCount, setHintsUsedCount] = useState(0); // Renomeado para clareza
+  const [hintUsed, setHintUsed] = useState(false);
+  const [hintLevel, setHintLevel] = useState(0);
   const [score, setScore] = useState(0);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [gameFinished, setGameFinished] = useState(false);
   const [playerName, setPlayerName] = useState("");
-  const [showHintText, setShowHintText] = useState(""); // Armazena o texto da dica ativa
+  const [showHintText, setShowHintText] = useState("");
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -52,18 +52,20 @@ export default function DesafioEmojisPage() {
     const correct = userAnswer.trim().toLowerCase() === emojiChallenges[currentChallenge].answer.toLowerCase();
     setIsCorrect(correct);
     if (correct) {
-      // Pontuação: 2 pontos sem dica, 1 ponto com qualquer dica.
-      setScore(score + (hintsUsedCount > 0 ? 1 : 2)); 
+      setScore(score + (hintUsed ? 1 : 2)); 
     }
     setShowResult(true);
   };
 
-  const useHint = (hintLevel) => {
+  const useHint = () => {
     if (showResult) return;
-    setHintsUsedCount(hintLevel); // Define o nível da dica usada (1 ou 2)
-    if (hintLevel === 1) {
+    
+    if (!hintUsed) {
+      setHintLevel(1);
       setShowHintText(emojiChallenges[currentChallenge].hint1);
-    } else if (hintLevel === 2) {
+      setHintUsed(true);
+    } else if (hintLevel === 1) {
+      setHintLevel(2);
       setShowHintText(emojiChallenges[currentChallenge].hint2);
     }
   };
@@ -74,8 +76,9 @@ export default function DesafioEmojisPage() {
       setUserAnswer("");
       setShowResult(false);
       setIsCorrect(false);
-      setHintsUsedCount(0); // Reseta número de dicas usadas
-      setShowHintText("");   // Reseta texto da dica
+      setHintUsed(false);
+      setHintLevel(0);
+      setShowHintText("");
     } else {
       setGameFinished(true);
     }
@@ -88,7 +91,7 @@ export default function DesafioEmojisPage() {
           player_name: playerName,
           quiz_type: "emojis",
           score: score,
-          total_questions: emojiChallenges.length * 2, // Pontuação máxima (2 por desafio)
+          total_questions: emojiChallenges.length * 2,
           completion_time: timeElapsed
         });
       } catch (error) {
@@ -102,7 +105,8 @@ export default function DesafioEmojisPage() {
     setUserAnswer("");
     setShowResult(false);
     setIsCorrect(false);
-    setHintsUsedCount(0);
+    setHintUsed(false);
+    setHintLevel(0);
     setShowHintText("");
     setScore(0);
     setTimeElapsed(0);
@@ -203,24 +207,15 @@ export default function DesafioEmojisPage() {
               <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
             </Button>
           </Link>
-          <div className="flex items-center gap-2"> {/* Reduzido gap aqui */}
+          <div className="flex items-center gap-2">
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => useHint(1)}
-              disabled={hintsUsedCount >= 1 || showResult}
+              onClick={useHint}
+              disabled={hintLevel >= 2 || showResult}
               className="border-blue-600 text-blue-400 hover:bg-blue-600/10 text-xs px-2 py-1" 
             >
-              <HelpCircle className="w-3 h-3 mr-1" /> Dica 1
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => useHint(2)}
-              disabled={hintsUsedCount >= 2 || showResult}
-              className="border-purple-600 text-purple-400 hover:bg-purple-600/10 text-xs px-2 py-1"
-            >
-              <HelpCircle className="w-3 h-3 mr-1" /> Dica 2
+              <HelpCircle className="w-3 h-3 mr-1" /> Dica
             </Button>
             <Badge variant="outline" className="border-pink-600 text-pink-400">
               <Smile className="w-4 h-4 mr-1" />
@@ -265,7 +260,7 @@ export default function DesafioEmojisPage() {
                   {emojiChallenges[currentChallenge].emojis}
                 </CardTitle>
                 <p className="text-gray-400">Adivinhe a música ou conceito brega!</p>
-                 {hintsUsedCount > 0 && !showResult && (
+                 {showHintText && !showResult && (
                   <div className="mt-2 p-3 bg-blue-900/20 border border-blue-700 rounded-lg text-center">
                     <p className="text-blue-300 text-sm">
                       <Lightbulb className="inline w-4 h-4 mr-1 text-yellow-400" /> 
@@ -320,8 +315,8 @@ export default function DesafioEmojisPage() {
                      <Lightbulb className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />
                     {emojiChallenges[currentChallenge].explanation}
                   </p>
-                  {hintsUsedCount > 0 && (
-                     <p className="text-xs text-purple-400 mt-2">(Você usou {hintsUsedCount} dica(s) neste desafio)</p>
+                  {hintUsed && (
+                     <p className="text-xs text-purple-400 mt-2">(Você usou uma dica neste desafio)</p>
                   )}
                   <Button 
                     onClick={handleNextChallenge}

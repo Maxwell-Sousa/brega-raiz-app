@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { QuizScore } from "@/entities/QuizScore";
-import { ArrowLeft, Calendar, Star, CheckCircle, XCircle, Trophy, RotateCcw, GripVertical, Award, Lightbulb } from "lucide-react";
+import { ArrowLeft, Calendar, Star, CheckCircle, XCircle, Trophy, RotateCcw, GripVertical, Award, HelpCircle } from "lucide-react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -22,7 +21,6 @@ const timelineEvents = [
   { id: "10", year: 2023, event: "Brega inspira exposições de arte contemporânea", explanation: "O gênero é celebrado como símbolo da cultura popular brasileira." }
 ];
 
-// Função para embaralhar o array
 const shuffleArray = (array) => {
   let currentIndex = array.length, randomIndex;
   while (currentIndex !== 0) {
@@ -33,17 +31,16 @@ const shuffleArray = (array) => {
   return array;
 };
 
-
 export default function LinhaTimelinePage() {
   const [orderedEvents, setOrderedEvents] = useState(() => shuffleArray([...timelineEvents]));
   const [showResult, setShowResult] = useState(false);
   const [isCorrectOrder, setIsCorrectOrder] = useState(false);
-  const [score, setScore] = useState(0); // Número de itens na posição correta
-  const [finalScoreToSave, setFinalScoreToSave] = useState(0); // Pontuação final após aplicar penalidade de dica
+  const [score, setScore] = useState(0);
+  const [finalScoreToSave, setFinalScoreToSave] = useState(0);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [gameFinished, setGameFinished] = useState(false);
   const [playerName, setPlayerName] = useState("");
-  const [hintUsedTimeline, setHintUsedTimeline] = useState(false);
+  const [hintUsed, setHintUsed] = useState(false);
   const [hintText, setHintText] = useState("");
 
   useEffect(() => {
@@ -70,8 +67,7 @@ export default function LinhaTimelinePage() {
     setIsCorrectOrder(allCorrect);
     setScore(correctCount);
     
-    // Calcula pontuação final para salvar
-    const finalScore = hintUsedTimeline ? Math.floor(correctCount / 2) : correctCount;
+    const finalScore = hintUsed ? Math.floor(correctCount / 2) : correctCount;
     setFinalScoreToSave(finalScore);
 
     setShowResult(true);
@@ -81,7 +77,7 @@ export default function LinhaTimelinePage() {
   };
 
   const useHint = () => {
-    if (hintUsedTimeline || showResult) return;
+    if (hintUsed || showResult) return;
 
     const correctOrderFull = [...timelineEvents].sort((a, b) => a.year - b.year);
     
@@ -96,19 +92,19 @@ export default function LinhaTimelinePage() {
         const randomIncorrectItem = incorrectItems[Math.floor(Math.random() * incorrectItems.length)];
         const originalItemData = timelineEvents.find(e => e.id === randomIncorrectItem.id);
         setHintText(`Dica: O evento "${originalItemData.event.substring(0,25)}${originalItemData.event.length > 25 ? '...' : ''}" aconteceu em ${originalItemData.year}.`);
-        setHintUsedTimeline(true);
+        setHintUsed(true);
     } else {
         setHintText("Todos os itens parecem estar na ordem correta!");
+        setHintUsed(true);
     }
   };
 
   const handleNextAttempt = () => {
     setShowResult(false);
-    setHintText(""); // Limpa o texto da dica
+    setHintText("");
     if (isCorrectOrder) { 
         setGameFinished(true);
     }
-    // Se não acertou, o usuário pode tentar reordenar.
   };
 
   const saveScore = async () => {
@@ -117,7 +113,7 @@ export default function LinhaTimelinePage() {
         await QuizScore.create({
           player_name: playerName,
           quiz_type: "timeline",
-          score: finalScoreToSave, // Usa a pontuação final com possível penalidade
+          score: finalScoreToSave,
           total_questions: timelineEvents.length, 
           completion_time: timeElapsed
         });
@@ -136,19 +132,19 @@ export default function LinhaTimelinePage() {
     setTimeElapsed(0);
     setGameFinished(false);
     setPlayerName("");
-    setHintUsedTimeline(false);
+    setHintUsed(false);
     setHintText("");
   };
   
   const getScoreMessage = () => {
-    const hintMessage = hintUsedTimeline ? " (Dica usada)" : "";
+    const hintMessage = hintUsed ? " (Dica usada)" : "";
     if (isCorrectOrder && score === timelineEvents.length) return `Você é um mestre da história do brega!${hintMessage} 🗓️✨`;
     if (score >= timelineEvents.length * 0.7) return `Impressionante! Sua linha do tempo está quase perfeita!${hintMessage} 🤓`;
     if (score >= timelineEvents.length * 0.4) return `Bom trabalho! Alguns eventos no lugar certo!${hintMessage} 👍`;
     return `A história do brega tem seus segredos! Tente de novo!${hintMessage} 🧐`;
   };
 
-  if (gameFinished && isCorrectOrder) { // Mostrar tela final apenas se acertou tudo
+  if (gameFinished && isCorrectOrder) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6 flex items-center justify-center">
         <motion.div
@@ -181,7 +177,7 @@ export default function LinhaTimelinePage() {
               
               <div className="bg-gradient-to-r from-pink-900/20 to-red-900/20 p-6 rounded-xl border border-red-800/30">
                 <p className="text-xl text-white font-medium">{getScoreMessage()}</p>
-                {hintUsedTimeline && <p className="text-sm text-purple-300">(Você usou uma dica, sua pontuação foi ajustada)</p>}
+                {hintUsed && <p className="text-sm text-purple-300">(Você usou uma dica, sua pontuação foi ajustada)</p>}
               </div>
 
               <div className="space-y-4">
@@ -238,10 +234,10 @@ export default function LinhaTimelinePage() {
               variant="outline" 
               size="sm"
               onClick={useHint}
-              disabled={hintUsedTimeline || showResult}
-              className="border-purple-600 text-purple-400 hover:bg-purple-600/10"
+              disabled={hintUsed || showResult}
+              className="border-blue-600 text-blue-400 hover:bg-blue-600/10 text-xs px-2 py-1"
             >
-              <Lightbulb className="w-4 h-4 mr-1" /> Dica (Reduz Pontos)
+              <HelpCircle className="w-3 h-3 mr-1" /> Dica
             </Button>
             <Badge variant="outline" className="border-pink-600 text-pink-400">
               <Calendar className="w-4 h-4 mr-1" />
@@ -329,7 +325,7 @@ export default function LinhaTimelinePage() {
                   {!isCorrectOrder && (
                     <p className="text-gray-400 text-sm mb-4">Continue tentando para aperfeiçoar sua linha do tempo! Os anos corretos estão agora visíveis para referência.</p>
                   )}
-                   {hintUsedTimeline && (
+                   {hintUsed && (
                     <p className="text-xs text-purple-400 mt-2">(Dica utilizada, pontuação ajustada se necessário no final)</p>
                   )}
                   <Button 

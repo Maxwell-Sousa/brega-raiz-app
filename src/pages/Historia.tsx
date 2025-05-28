@@ -1,128 +1,70 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Music, User, MapPin, PlayCircle, ExternalLink, Heart, Sparkles, Mic2, Radio } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { HistoriaContent } from "@/entities/HistoriaContent";
+
+// Fallback data in case database is empty
+const fallbackEras = {
+  origem: {
+    title: "Origens (1960s)",
+    period: "Final dos anos 1960",
+    description: "O nascimento de uma expressão musical que mudaria para sempre a cultura brasileira",
+    content: `O brega nasceu no Brasil no final da década de 1960, em um período de intensa transformação social, política e cultural. Durante a Ditadura Militar, a industrialização acelerada e o êxodo rural, surgiu esta expressão musical das camadas populares.
+
+O termo "brega" inicialmente era uma gíria pejorativa, associada a locais populares de baixa renda como cabarés e boates. Ironicamente, foi justamente nestes espaços que nasceu um dos gêneros mais autênticos da música brasileira.
+
+Caracterizado por letras simples e diretas sobre amor, traição, dor e saudade, o brega trazia melodias marcantes e sentimentais, com forte influência da música romântica latino-americana e do bolero.`,
+    artists: ["Nelson Ned", "Reginaldo Rossi", "Waldick Soriano"],
+    landmarks: [
+      "Surgimento nos cabarés e boates populares",
+      "Primeira geração de artistas bregas",
+      "Influência do bolero e música romântica latina"
+    ]
+  }
+};
 
 export default function HistoriaPage() {
   const [selectedEra, setSelectedEra] = useState("origem");
+  const [eras, setEras] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  const eras = {
-    origem: {
-      title: "Origens (1960s)",
-      period: "Final dos anos 1960",
-      description: "O nascimento de uma expressão musical que mudaria para sempre a cultura brasileira",
-      content: `O brega nasceu no Brasil no final da década de 1960, em um período de intensa transformação social, política e cultural. Durante a Ditadura Militar, a industrialização acelerada e o êxodo rural, surgiu esta expressão musical das camadas populares.
+  useEffect(() => {
+    const loadHistoriaContent = async () => {
+      try {
+        const data = await HistoriaContent.getAll();
+        
+        if (data && data.length > 0) {
+          // Convert array to object with era_key as key
+          const erasObject = {};
+          data.forEach(era => {
+            erasObject[era.era_key] = {
+              title: era.title,
+              period: era.period,
+              description: era.description,
+              content: era.content,
+              artists: era.artists || [],
+              landmarks: era.landmarks || []
+            };
+          });
+          setEras(erasObject);
+        } else {
+          // Use fallback data if database is empty
+          setEras(fallbackEras);
+        }
+      } catch (error) {
+        console.error('Error loading historia content:', error);
+        // Use fallback data on error
+        setEras(fallbackEras);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      O termo "brega" inicialmente era uma gíria pejorativa, associada a locais populares de baixa renda como cabarés e boates. Ironicamente, foi justamente nestes espaços que nasceu um dos gêneros mais autênticos da música brasileira.
-
-      Caracterizado por letras simples e diretas sobre amor, traição, dor e saudade, o brega trazia melodias marcantes e sentimentais, com forte influência da música romântica latino-americana e do bolero.`,
-      artists: ["Nelson Ned", "Reginaldo Rossi", "Waldick Soriano"],
-      landmarks: [
-        "Surgimento nos cabarés e boates populares",
-        "Primeira geração de artistas bregas",
-        "Influência do bolero e música romântica latina"
-      ]
-    },
-    consolidacao: {
-      title: "Consolidação (1970s)",
-      period: "Década de 1970",
-      description: "O brega se espalha pelo Brasil e conquista seu público fiel",
-      content: `Os anos 1970 marcaram a consolidação do brega como estilo popular. Apesar da resistência da elite cultural, o gênero conquistou rádios, feiras, festas de interior e grandes públicos, especialmente no Nordeste e Centro-Oeste.
-
-      A evolução musical trouxe arranjos mais elaborados com teclados, metais e guitarras, misturando elementos do sertanejo, jovem guarda e música romântica internacional. O brega começou a desenvolver sua identidade visual única, com performances dramáticas e figurinos exuberantes.
-
-      Mesmo com o estigma social - o termo "brega" ainda associado ao "cafona" e "kitsch" - o público popular abraçava e legitimava o estilo, criando uma base sólida para sua expansão.`,
-      artists: ["Reginaldo Rossi", "Agnaldo Timóteo", "Carlos Alexandre"],
-      landmarks: [
-        "Popularização nacional do gênero",
-        "Sucesso de 'Garçom' e 'A Raposa e as Uvas'",
-        "Desenvolvimento da estética visual brega"
-      ]
-    },
-    midia: {
-      title: "Era da Mídia (1980s)",
-      period: "Década de 1980",
-      description: "O brega conquista rádio e TV, consolidando a estética da dor popular",
-      content: `Os anos 1980 marcaram a ampliação midiática do brega, que passou a frequentar programas de auditório e rádio. Houve um fortalecimento significativo dos artistas regionais, especialmente no Norte e Nordeste.
-
-      Musicalmente, o período viu o uso cada vez maior de teclados eletrônicos e sintetizadores, antecipando as transformações que viriam. As letras continuaram centradas em amor, traição, ciúmes e sofrimento, consolidando a "estética da dor popular" como marca registrada do gênero.
-
-      A década estabeleceu o brega como um fenômeno cultural genuinamente brasileiro, com artistas vendendo milhões de discos e lotando shows por todo o país.`,
-      artists: ["Amado Batista", "Régis Danese", "Paulo Sérgio", "Carlos André"],
-      landmarks: [
-        "Presença em programas de TV e rádio",
-        "Uso de sintetizadores e teclados eletrônicos",
-        "Consolidação da temática romântica-dramática"
-      ]
-    },
-    modernizacao: {
-      title: "Modernização (1990s)",
-      period: "Década de 1990",
-      description: "Surgem novas vertentes e o brega se transforma",
-      content: `Os anos 1990 trouxeram transformações revolucionárias ao brega. Surgiu o brega eletrônico e nasceu o "brega das aparelhagens" no Norte do Brasil, especialmente no Pará. As grandes aparelhagens de som como "Super Pop" e "Treme-Treme" começaram a transformar o brega em música de festa.
-
-      Emergiu também o brega calypso, uma mistura inovadora de brega com guitarradas, carimbó e batidas eletrônicas. A Banda Calypso, formada em 1999, tornou-se um dos maiores símbolos dessa nova fase, alcançando enorme sucesso nacional e redefinindo os limites do gênero.
-
-      Esta década marcou a transição do brega de música de sofrimento para música de celebração, mantendo sua essência popular mas expandindo suas possibilidades expressivas.`,
-      artists: ["Banda Calypso", "Aparelhagens do Pará", "Artistas do brega eletrônico"],
-      landmarks: [
-        "Nascimento do brega eletrônico",
-        "Surgimento das aparelhagens no Pará",
-        "Criação da Banda Calypso"
-      ]
-    },
-    tecnobrega: {
-      title: "Tecnobrega (2000s)",
-      period: "Década de 2000",
-      description: "A revolução digital e a autonomia criativa",
-      content: `Os anos 2000 marcaram uma revolução com o surgimento do tecnobrega em Belém do Pará, especialmente no bairro da Terra Firme. Esta nova vertente misturou elementos eletrônicos com batidas dançantes do brega tradicional, sendo produzida principalmente por DJs e MCs locais.
-
-      O tecnobrega revolucionou a indústria musical com sua autonomia na produção, distribuição independente em camelôs e feiras, e shows gigantescos, gratuitos ou com preços acessíveis. Criou um novo modelo de negócio musical totalmente independente.
-
-      Gaby Amarantos, a "Beyoncé do Pará", levou o tecnobrega à projeção nacional com hits como "Xirley" e "Ex Mai Love", provando que o brega poderia conquistar qualquer público, de qualquer classe social.`,
-      artists: ["Gaby Amarantos", "DJ Waldo Squash", "Gang do Eletro"],
-      landmarks: [
-        "Surgimento em Belém do Pará",
-        "Modelo de distribuição independente",
-        "Projeção nacional com Gaby Amarantos"
-      ]
-    },
-    bregafunk: {
-      title: "Brega Funk (2010s)",
-      period: "Década de 2010",
-      description: "O estouro nacional e a conquista das redes sociais",
-      content: `A década de 2010 trouxe o brega funk, surgido no Recife como uma fusão explosiva entre o brega, o funk carioca e a música eletrônica. Fortemente associado à cultura periférica e às danças virais, o brega funk conquistou as redes sociais.
-
-      Com letras mais ousadas e irreverentes, batidas sincopadas e rápidas, o brega funk criou uma estética própria focada no rebolado e na dança. Tornou-se um fenômeno viral, influenciando até o funk paulista e carioca.
-
-      Esta vertente levou o brega ao mainstream nacional e internacional, mostrando a capacidade infinita de reinvenção do gênero e sua relevância na cultura pop contemporânea.`,
-      artists: ["Shevchenko e Elloco", "MC Elvis", "MC Troinha", "Brega Bregoso"],
-      landmarks: [
-        "Surgimento em Recife",
-        "Fenômeno viral nas redes sociais",
-        "Influência no funk nacional"
-      ]
-    },
-    mainstream: {
-      title: "Mainstream (2020s)",
-      period: "Década de 2020",
-      description: "Reconhecimento cultural e conquista definitiva",
-      content: `Os anos 2020 marcaram a consagração definitiva do brega. Da marginalização inicial ao palco do mainstream, o gênero conquistou grandes festivais como Rock in Rio, foi incluído em novelas, séries e playlists internacionais.
-
-      O reconhecimento acadêmico e cultural veio através de teses, livros e documentários sobre o brega e sua importância social. Artistas contemporâneos de diversos gêneros passaram a homenagear o brega em shows e parcerias.
-
-      Hoje, o brega é considerado um dos movimentos musicais mais importantes do Brasil, reconhecido como patrimônio cultural vivo e símbolo de resistência popular. Representa não apenas um gênero musical, mas uma expressão social, afetiva e cultural das camadas populares brasileiras.`,
-      artists: ["Nova geração de artistas bregas", "Colaborações mainstream", "Artistas contemporâneos"],
-      landmarks: [
-        "Participação em grandes festivais",
-        "Reconhecimento acadêmico",
-        "Patrimônio cultural brasileiro"
-      ]
-    }
-  };
+    loadHistoriaContent();
+  }, []);
 
   const famousArtists = [
     {
@@ -183,6 +125,14 @@ export default function HistoriaPage() {
     ]
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6 flex items-center justify-center">
+        <div className="text-white">Carregando conteúdo histórico...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6">
       <div className="max-w-7xl mx-auto">
@@ -238,74 +188,76 @@ export default function HistoriaPage() {
         </motion.div>
 
         {/* Era Content */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={selectedEra}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.4 }}
-            className="grid lg:grid-cols-2 gap-8 mb-12"
-          >
-            <Card className="bg-black/40 border-gray-800 backdrop-blur-xl">
-              <CardHeader>
-                <CardTitle className="text-2xl text-yellow-400 flex items-center gap-2">
-                  <Music className="w-6 h-6" />
-                  {eras[selectedEra].title}
-                </CardTitle>
-                <Badge variant="outline" className="w-fit border-red-600 text-red-400">
-                  {eras[selectedEra].period}
-                </Badge>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-300 leading-relaxed whitespace-pre-line text-sm">
-                  {eras[selectedEra].content}
-                </p>
-              </CardContent>
-            </Card>
-
-            <div className="space-y-6">
-              {/* Artists */}
+        {eras[selectedEra] && (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={selectedEra}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.4 }}
+              className="grid lg:grid-cols-2 gap-8 mb-12"
+            >
               <Card className="bg-black/40 border-gray-800 backdrop-blur-xl">
                 <CardHeader>
-                  <CardTitle className="text-xl text-white flex items-center gap-2">
-                    <User className="w-5 h-5" />
-                    Artistas Principais
+                  <CardTitle className="text-2xl text-yellow-400 flex items-center gap-2">
+                    <Music className="w-6 h-6" />
+                    {eras[selectedEra].title}
                   </CardTitle>
+                  <Badge variant="outline" className="w-fit border-red-600 text-red-400">
+                    {eras[selectedEra].period}
+                  </Badge>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    {eras[selectedEra].artists.map((artist, index) => (
-                      <div key={index} className="bg-gray-900/50 p-3 rounded-lg border border-gray-700">
-                        <p className="font-medium text-yellow-400">{artist}</p>
-                      </div>
-                    ))}
-                  </div>
+                  <p className="text-gray-300 leading-relaxed whitespace-pre-line text-sm">
+                    {eras[selectedEra].content}
+                  </p>
                 </CardContent>
               </Card>
 
-              {/* Landmarks */}
-              <Card className="bg-black/40 border-gray-800 backdrop-blur-xl">
-                <CardHeader>
-                  <CardTitle className="text-xl text-white flex items-center gap-2">
-                    <MapPin className="w-5 h-5" />
-                    Marcos Históricos
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {eras[selectedEra].landmarks.map((landmark, index) => (
-                      <div key={index} className="flex items-start gap-3 p-3 bg-red-900/20 rounded-lg border border-red-800/30">
-                        <div className="w-2 h-2 bg-red-500 rounded-full mt-2 shrink-0"></div>
-                        <p className="text-gray-300 text-sm leading-relaxed">{landmark}</p>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </motion.div>
-        </AnimatePresence>
+              <div className="space-y-6">
+                {/* Artists */}
+                <Card className="bg-black/40 border-gray-800 backdrop-blur-xl">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-white flex items-center gap-2">
+                      <User className="w-5 h-5" />
+                      Artistas Principais
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {eras[selectedEra].artists.map((artist, index) => (
+                        <div key={index} className="bg-gray-900/50 p-3 rounded-lg border border-gray-700">
+                          <p className="font-medium text-yellow-400">{artist}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Landmarks */}
+                <Card className="bg-black/40 border-gray-800 backdrop-blur-xl">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-white flex items-center gap-2">
+                      <MapPin className="w-5 h-5" />
+                      Marcos Históricos
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {eras[selectedEra].landmarks.map((landmark, index) => (
+                        <div key={index} className="flex items-start gap-3 p-3 bg-red-900/20 rounded-lg border border-red-800/30">
+                          <div className="w-2 h-2 bg-red-500 rounded-full mt-2 shrink-0"></div>
+                          <p className="text-gray-300 text-sm leading-relaxed">{landmark}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        )}
 
         {/* Famous Artists Section */}
         <motion.div

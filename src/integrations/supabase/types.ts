@@ -36,6 +36,45 @@ export type Database = {
         }
         Relationships: []
       }
+      historia_content: {
+        Row: {
+          artists: string[] | null
+          content: string
+          created_at: string
+          description: string
+          era_key: string
+          id: string
+          landmarks: string[] | null
+          period: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          artists?: string[] | null
+          content: string
+          created_at?: string
+          description: string
+          era_key: string
+          id?: string
+          landmarks?: string[] | null
+          period: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          artists?: string[] | null
+          content?: string
+          created_at?: string
+          description?: string
+          era_key?: string
+          id?: string
+          landmarks?: string[] | null
+          period?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       lyrics_complete: {
         Row: {
           artist: string
@@ -99,6 +138,36 @@ export type Database = {
           option_c?: string
           option_d?: string
           question?: string
+        }
+        Relationships: []
+      }
+      quiz_scores: {
+        Row: {
+          completion_time: number
+          created_at: string
+          id: string
+          player_name: string
+          quiz_type: string
+          score: number
+          total_questions: number
+        }
+        Insert: {
+          completion_time: number
+          created_at?: string
+          id?: string
+          player_name: string
+          quiz_type: string
+          score: number
+          total_questions: number
+        }
+        Update: {
+          completion_time?: number
+          created_at?: string
+          id?: string
+          player_name?: string
+          quiz_type?: string
+          score?: number
+          total_questions?: number
         }
         Relationships: []
       }
