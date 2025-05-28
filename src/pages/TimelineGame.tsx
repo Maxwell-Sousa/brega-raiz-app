@@ -3,25 +3,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { QuizScore } from "@/entities/QuizScore";
+import { TimelineEvent } from "@/entities/TimelineEvent";
 import { ArrowLeft, Calendar, Star, CheckCircle, XCircle, Trophy, RotateCcw, GripVertical, Award, HelpCircle } from "lucide-react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
-const timelineEvents = [
+// Fallback events in case database is empty
+const fallbackEvents = [
   { id: "1", year: 1973, event: "Evaldo Braga morre precocemente", explanation: "O 'Ídolo Negro' deixou legado marcante no brega." },
   { id: "2", year: 1975, event: "Amado Batista lança seu primeiro disco", explanation: "Início da carreira de um dos maiores nomes do brega romântico." },
-  { id: "3", year: 1985, event: "Reginaldo Rossi lança 'A Raposa e as Uvas'", explanation: "Música que se torna um dos maiores sucessos do cantor." },
-  { id: "4", year: 1993, event: "Falcão lança 'Bonito, Lindo e Joiado'", explanation: "Populariza o brega humorístico no Brasil." },
-  { id: "5", year: 2002, event: "Explosão das festas de aparelhagem no Pará", explanation: "Marca a ascensão definitiva do tecnobrega." },
-  { id: "6", year: 2006, event: "Banda Calypso alcança sucesso nacional", explanation: "Mistura de brega, forró e música eletrônica." },
-  { id: "7", year: 2014, event: "Tecnobrega invade playlists digitais", explanation: "O estilo rompe barreiras regionais e conquista o streaming." },
-  { id: "8", year: 2017, event: "Brega funk vira febre nacional", explanation: "Com hits virais, como 'Envolvimento' de MC Loma." },
-  { id: "9", year: 2019, event: "Brega reconhecido como patrimônio cultural de Recife", explanation: "Momento de valorização oficial do gênero." },
-  { id: "10", year: 2023, event: "Brega inspira exposições de arte contemporânea", explanation: "O gênero é celebrado como símbolo da cultura popular brasileira." }
+  { id: "3", year: 1985, event: "Reginaldo Rossi lança 'A Raposa e as Uvas'", explanation: "Música que se torna um dos maiores sucessos do cantor." }
 ];
 
-const shuffleArray = (array) => {
+const shuffleArray = (array: any[]) => {
   let currentIndex = array.length, randomIndex;
   while (currentIndex !== 0) {
     randomIndex = Math.floor(Math.random() * currentIndex);
@@ -31,8 +26,9 @@ const shuffleArray = (array) => {
   return array;
 };
 
-export default function LinhaTimelinePage() {
-  const [orderedEvents, setOrderedEvents] = useState(() => shuffleArray([...timelineEvents]));
+export default function TimelineGamePage() {
+  const [timelineEvents, setTimelineEvents] = useState<any[]>([]);
+  const [orderedEvents, setOrderedEvents] = useState<any[]>([]);
   const [showResult, setShowResult] = useState(false);
   const [isCorrectOrder, setIsCorrectOrder] = useState(false);
   const [score, setScore] = useState(0);
@@ -42,6 +38,38 @@ export default function LinhaTimelinePage() {
   const [playerName, setPlayerName] = useState("");
   const [hintUsed, setHintUsed] = useState(false);
   const [hintText, setHintText] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadTimelineEvents = async () => {
+      try {
+        const data = await TimelineEvent.getAll();
+        if (data && data.length > 0) {
+          // Convert database format to game format
+          const events = data.map(event => ({
+            id: event.id,
+            year: event.year,
+            event: event.event_title,
+            explanation: event.description
+          }));
+          setTimelineEvents(events);
+          setOrderedEvents(shuffleArray([...events]));
+        } else {
+          console.log('No timeline events found in database, using fallback events');
+          setTimelineEvents(fallbackEvents);
+          setOrderedEvents(shuffleArray([...fallbackEvents]));
+        }
+      } catch (error) {
+        console.error('Error loading timeline events:', error);
+        setTimelineEvents(fallbackEvents);
+        setOrderedEvents(shuffleArray([...fallbackEvents]));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTimelineEvents();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -143,6 +171,14 @@ export default function LinhaTimelinePage() {
     if (score >= timelineEvents.length * 0.4) return `Bom trabalho! Alguns eventos no lugar certo!${hintMessage} 👍`;
     return `A história do brega tem seus segredos! Tente de novo!${hintMessage} 🧐`;
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6 flex items-center justify-center">
+        <div className="text-white">Carregando eventos da linha do tempo...</div>
+      </div>
+    );
+  }
 
   if (gameFinished && isCorrectOrder) {
     return (
@@ -268,14 +304,14 @@ export default function LinhaTimelinePage() {
           <CardContent className="space-y-4">
             <Reorder.Group axis="y" values={orderedEvents} onReorder={setOrderedEvents} className="space-y-3">
               {orderedEvents.map((item, index) => {
-                const originalEvent = timelineEvents.find(e => e.id === item.id); // Para pegar o ano original para a chave, se necessário
+                const originalEvent = timelineEvents.find(e => e.id === item.id);
                 const correctOrderFull = [...timelineEvents].sort((a, b) => a.year - b.year);
                 const isCorrectPosition = showResult && originalEvent.id === correctOrderFull[index].id;
 
                 return (
                   <Reorder.Item 
                     key={originalEvent.id} 
-                    value={item} // o item em si é o que é reordenado
+                    value={item}
                     className={`p-4 border rounded-lg cursor-grab active:cursor-grabbing flex items-center transition-colors duration-300
                                 ${showResult ? (isCorrectPosition ? 'bg-green-800/50 border-green-600' : 'bg-red-800/50 border-red-600') 
                                             : 'bg-gray-800/70 border-gray-700'}`}

@@ -1,132 +1,69 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { QuizScore } from "@/entities/QuizScore";
+import { QuizQuestion } from "@/entities/QuizQuestion";
 import { ArrowLeft, Clock, Star, CheckCircle, XCircle, Trophy, RotateCcw, Lightbulb } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
-export default function QuizHistoriaPage() {
+// Fallback questions in case database is empty
+const fallbackQuestions = [
+  {
+    question: "Qual artista é conhecido como o 'Rei do Brega'?",
+    option_a: "Waldick Soriano",
+    option_b: "Reginaldo Rossi", 
+    option_c: "Nelson Ned",
+    option_d: "Amado Batista",
+    correct_answer: 1,
+    explanation: "Reginaldo Rossi é amplamente reconhecido como o 'Rei do Brega', famoso por sucessos como 'Garçom' e 'A Raposa e as Uvas'."
+  },
+  {
+    question: "Em que década o brega surgiu no Brasil?",
+    option_a: "1950",
+    option_b: "1960",
+    option_c: "1970", 
+    option_d: "1980",
+    correct_answer: 1,
+    explanation: "O brega surgiu no final da década de 1960, inicialmente nos cabarés e boates populares."
+  }
+];
+
+export default function QuizGamePage() {
+  const [questions, setQuestions] = useState<any[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [gameFinished, setGameFinished] = useState(false);
   const [playerName, setPlayerName] = useState("");
-  const [hintUsedThisQuestion, setHintUsedThisQuestion] = useState(false);
-  const [showHintText, setShowHintText] = useState(false);
+  const [hintUsed, setHintUsed] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const questions = [
-    {
-      question: "Em que década surgiu o gênero brega no Brasil?",
-      options: ["1950", "1960", "1970", "1980"],
-      correct: 1,
-      explanation: "O brega surgiu na década de 1960, emergindo das periferias urbanas como expressão da classe trabalhadora.",
-      hint: "Foi uma década de grandes transformações culturais no Brasil e no mundo."
-    },
-    {
-      question: "Quem é conhecido como o 'Rei do Brega'?",
-      options: ["Waldick Soriano", "Reginaldo Rossi", "Falcão", "Amado Batista"],
-      correct: 1,
-      explanation: "Reginaldo Rossi é amplamente reconhecido como o 'Rei do Brega', autor de clássicos como 'Garçom'.",
-      hint: "Seu maior sucesso é sobre um pedido a um funcionário de bar."
-    },
-    {
-      question: "Qual música de Waldick Soriano se tornou um clássico?",
-      options: ["Garçom", "Eu Não Sou Cachorro, Não", "Rindo à Toa", "A Raposa e as Uvas"],
-      correct: 1,
-      explanation: "'Eu Não Sou Cachorro, Não' é uma das mais famosas canções de Waldick Soriano, o Príncipe do Brega.",
-      hint: "O título da música é uma afirmação de sua dignidade."
-    },
-    {
-      question: "O que caracteriza principalmente as letras do brega?",
-      options: ["Temas políticos", "Amores e desilusões", "Crítica social", "Natureza"],
-      correct: 1,
-      explanation: "As letras do brega são conhecidas por abordar temas românticos, amores não correspondidos e desilusões.",
-      hint: "Sentimentos intensos e muitas vezes sofridos são o foco."
-    },
-    {
-      question: "Qual artista é famoso por suas performances extravagantes?",
-      options: ["Reginaldo Rossi", "Waldick Soriano", "Falcão", "Nelson Gonçalves"],
-      correct: 2,
-      explanation: "Falcão, conhecido como 'O Roba a Cena', é famoso por suas performances teatrais e extravagantes.",
-      hint: "Ele usa roupas coloridas e um girassol no paletó."
-    },
-    {
-      question: "Quem popularizou a música 'A Raposa e as Uvas'?",
-      options: ["Waldick Soriano", "Falcão", "Reginaldo Rossi", "Amado Batista"],
-      correct: 2,
-      explanation: "Outro clássico de Reginaldo Rossi, 'A Raposa e as Uvas' utiliza uma metáfora romântica.",
-      hint: "O artista é o mesmo da pergunta sobre o 'Rei do Brega'."
-    },
-    {
-      question: "O tecnobrega surgiu fortemente em qual estado brasileiro?",
-      options: ["São Paulo", "Bahia", "Pernambuco", "Pará"],
-      correct: 3,
-      explanation: "O Pará, especialmente Belém, foi o berço do tecnobrega, com suas famosas festas de aparelhagem.",
-      hint: "Este estado é conhecido por suas grandes festas com equipamentos de som potentes."
-    },
-    {
-      question: "Qual destes artistas também é conhecido pelo brega humorístico?",
-      options: ["Amado Batista", "Reginaldo Rossi", "Falcão", "Bartô Galeno"],
-      correct: 2,
-      explanation: "Falcão é mestre em misturar o brega com humor ácido e irreverente em suas canções e performances.",
-      hint: "É o mesmo artista da pergunta sobre performances extravagantes."
-    },
-    {
-      question: "Que instrumento eletrônico é característico no tecnobrega?",
-      options: ["Guitarra Elétrica", "Bateria Acústica", "Teclado Sintetizador", "Saxofone"],
-      correct: 2,
-      explanation: "O teclado sintetizador é uma marca registrada para criar as batidas e os efeitos sonoros no tecnobrega.",
-      hint: "Pense em sons modernos e batidas dançantes."
-    },
-    {
-      question: "Qual música de Amado Batista fala de traição amorosa?",
-      options: ["Princesa", "Meu Ex-Amor", "Secretária", "Folha Seca"],
-      correct: 2,
-      explanation: "'Secretária' é um dos grandes sucessos de Amado Batista que aborda o tema do amor e da traição.",
-      hint: "O título refere-se a uma profissão."
-    },
-    {
-      question: "O brega é considerado patrimônio cultural de qual cidade?",
-      options: ["Rio de Janeiro", "Salvador", "Belém", "Recife"],
-      correct: 3,
-      explanation: "Em 2019, a cidade de Recife reconheceu oficialmente o brega como patrimônio cultural imaterial.",
-      hint: "Esta cidade é famosa pelo frevo e maracatu, mas também valoriza o brega."
-    },
-    {
-      question: "Em que década surgiu o brega funk?",
-      options: ["1990", "2000", "2010", "2020"],
-      correct: 2,
-      explanation: "O brega funk ganhou força e popularidade nacional nos anos 2010, especialmente em Recife.",
-      hint: "É uma fusão mais recente que explodiu com a internet."
-    },
-    {
-      question: "Quais são dois dos principais temas do brega?",
-      options: ["Amizade e Viagens", "Trabalho e Cotidiano", "Amor e Sofrimento", "Festa e Alegria"],
-      correct: 2,
-      explanation: "A lírica do brega gira predominantemente em torno de emoções passionais, o amor e a dor da perda.",
-      hint: "Sentimentos intensos, muitas vezes dramáticos."
-    },
-    {
-      question: "Qual estilo musical influenciou diretamente o tecnobrega?",
-      options: ["Samba", "Rock Progressivo", "Música Eletrônica", "Jazz"],
-      correct: 2,
-      explanation: "O tecnobrega é uma fusão do brega tradicional com diversos elementos da música eletrônica.",
-      hint: "Pense em batidas computadorizadas e sintetizadores."
-    },
-    {
-      question: "Que cantor ficou conhecido como 'Ídolo Negro' do brega?",
-      options: ["Luiz Ayrão", "Evaldo Braga", "Benito di Paula", "Agepê"],
-      correct: 1,
-      explanation: "Evaldo Braga, com sua voz marcante, foi um pioneiro do brega e muito popular nos anos 70, sendo chamado de 'Ídolo Negro'.",
-      hint: "Seu sobrenome é comum e ele teve uma carreira curta, mas impactante."
-    }
-  ];
+  useEffect(() => {
+    const loadQuestions = async () => {
+      try {
+        const data = await QuizQuestion.getAll();
+        if (data && data.length > 0) {
+          setQuestions(data);
+        } else {
+          console.log('No questions found in database, using fallback questions');
+          setQuestions(fallbackQuestions);
+        }
+      } catch (error) {
+        console.error('Error loading questions:', error);
+        setQuestions(fallbackQuestions);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadQuestions();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -134,37 +71,47 @@ export default function QuizHistoriaPage() {
         setTimeElapsed(prev => prev + 1);
       }
     }, 1000);
-
     return () => clearInterval(timer);
   }, [gameFinished]);
 
-  const handleAnswerSelect = (answerIndex) => {
+  const handleAnswerSelect = (answerIndex: number) => {
+    if (showResult) return;
     setSelectedAnswer(answerIndex);
   };
 
+  const checkAnswer = () => {
+    if (selectedAnswer === null) return;
+    const isCorrect = selectedAnswer === questions[currentQuestion].correct_answer;
+    if (isCorrect) {
+      const points = hintUsed ? 1 : 2;
+      setScore(score + points);
+    }
+    setShowResult(true);
+  };
+
   const useHint = () => {
-    setHintUsedThisQuestion(true);
-    setShowHintText(true);
+    if (showResult || hintUsed) return;
+    setHintUsed(true);
+    setShowHint(true);
+  };
+
+  const getHintText = () => {
+    const q = questions[currentQuestion];
+    const options = [q.option_a, q.option_b, q.option_c, q.option_d];
+    const correctOption = options[q.correct_answer];
+    return `A resposta correta começa com "${correctOption[0]}" e tem ${correctOption.length} letras.`;
   };
 
   const handleNextQuestion = () => {
-    if (selectedAnswer === questions[currentQuestion].correct) {
-      setScore(prevScore => prevScore + (hintUsedThisQuestion ? 0.5 : 1)); // Pontuação reduzida se dica usada
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+      setSelectedAnswer(null);
+      setShowResult(false);
+      setHintUsed(false);
+      setShowHint(false);
+    } else {
+      setGameFinished(true);
     }
-    
-    setShowResult(true);
-    
-    setTimeout(() => {
-      if (currentQuestion < questions.length - 1) {
-        setCurrentQuestion(currentQuestion + 1);
-        setSelectedAnswer(null);
-        setShowResult(false);
-        setHintUsedThisQuestion(false); // Reseta o uso da dica
-        setShowHintText(false);      // Reseta a exibição da dica
-      } else {
-        setGameFinished(true);
-      }
-    }, 2500); // Aumentado tempo para ler explicação e dica
   };
 
   const saveScore = async () => {
@@ -172,12 +119,11 @@ export default function QuizHistoriaPage() {
       try {
         await QuizScore.create({
           player_name: playerName,
-          quiz_type: "historia",
+          quiz_type: "quiz",
           score: score,
-          total_questions: questions.length, // Total de pontos possíveis sem dicas
+          total_questions: questions.length * 2,
           completion_time: timeElapsed
         });
-        // Adicionar feedback de sucesso ou erro ao usuário, se necessário
       } catch (error) {
         console.error("Erro ao salvar pontuação:", error);
       }
@@ -192,17 +138,26 @@ export default function QuizHistoriaPage() {
     setTimeElapsed(0);
     setGameFinished(false);
     setPlayerName("");
-    setHintUsedThisQuestion(false);
-    setShowHintText(false);
+    setHintUsed(false);
+    setShowHint(false);
   };
 
   const getScoreMessage = () => {
-    const percentage = (score / questions.length) * 100;
-    if (percentage >= 80) return "Você é um verdadeiro conhecedor do brega! 🎵";
-    if (percentage >= 60) return "Bom conhecimento! Continue estudando o brega! 👏";
-    if (percentage >= 40) return "Não foi mal, mas dá pra melhorar! 📚";
-    return "Que tal conhecer mais sobre o brega? 💡";
+    const maxPossibleScore = questions.length * 2;
+    const percentage = (score / maxPossibleScore) * 100;
+    if (percentage >= 80) return "Você é um verdadeiro expert em brega! 🎯";
+    if (percentage >= 60) return "Muito bem! Você conhece bastante sobre brega! 👏";
+    if (percentage >= 40) return "Bom trabalho! Continue estudando a história do brega! 📚";
+    return "Que tal explorar mais sobre a história do brega? 🎵";
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6 flex items-center justify-center">
+        <div className="text-white">Carregando perguntas...</div>
+      </div>
+    );
+  }
 
   if (gameFinished) {
     return (
@@ -214,7 +169,7 @@ export default function QuizHistoriaPage() {
         >
           <Card className="bg-black/40 border-gray-800 backdrop-blur-xl">
             <CardHeader className="text-center">
-              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-yellow-500 to-red-600 rounded-full flex items-center justify-center">
+              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                 <Trophy className="w-10 h-10 text-white" />
               </div>
               <CardTitle className="text-3xl text-white">Quiz Finalizado!</CardTitle>
@@ -222,27 +177,27 @@ export default function QuizHistoriaPage() {
             <CardContent className="space-y-6 text-center">
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-gray-900/50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-yellow-400">{score.toFixed(1)}</div> {/* Mostrar score com decimal */}
+                  <div className="text-2xl font-bold text-blue-400">{score}</div>
                   <div className="text-sm text-gray-400">Pontos</div>
                 </div>
                 <div className="bg-gray-900/50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-400">{Math.floor((score/questions.length)*100)}%</div>
+                  <div className="text-2xl font-bold text-purple-400">{Math.floor((score / (questions.length * 2)) * 100)}%</div>
                   <div className="text-sm text-gray-400">Precisão</div>
                 </div>
                 <div className="bg-gray-900/50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-green-400">{Math.floor(timeElapsed/60)}:{(timeElapsed%60).toString().padStart(2, '0')}</div>
+                  <div className="text-2xl font-bold text-pink-400">{Math.floor(timeElapsed/60)}:{(timeElapsed%60).toString().padStart(2, '0')}</div>
                   <div className="text-sm text-gray-400">Tempo</div>
                 </div>
               </div>
               
-              <div className="bg-gradient-to-r from-red-900/20 to-yellow-900/20 p-6 rounded-xl border border-red-800/30">
+              <div className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 p-6 rounded-xl border border-blue-800/30">
                 <p className="text-xl text-white font-medium">{getScoreMessage()}</p>
               </div>
 
               <div className="space-y-4">
                 <input
                   type="text"
-                  placeholder="Digite seu nome para salvar a pontuação"
+                  placeholder="Digite seu nome para salvar"
                   value={playerName}
                   onChange={(e) => setPlayerName(e.target.value)}
                   className="w-full p-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400"
@@ -251,7 +206,7 @@ export default function QuizHistoriaPage() {
                   <Button 
                     onClick={saveScore}
                     disabled={!playerName.trim()}
-                    className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600"
                   >
                     <Star className="w-4 h-4 mr-2" />
                     Salvar Pontuação
@@ -285,33 +240,40 @@ export default function QuizHistoriaPage() {
         >
           <Link to={createPageUrl("Jogos")}>
             <Button variant="outline" className="border-gray-700">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Voltar
+              <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
             </Button>
           </Link>
-          
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <Button 
               variant="outline" 
               size="sm"
               onClick={useHint}
-              disabled={hintUsedThisQuestion || showResult}
-              className="border-purple-600 text-purple-400 hover:bg-purple-600/10"
+              disabled={hintUsed || showResult}
+              className="border-yellow-600 text-yellow-400 hover:bg-yellow-600/10"
             >
-              <Lightbulb className="w-4 h-4 mr-1" /> Dica (-0.5 pts)
+              <Lightbulb className="w-4 h-4 mr-1" /> Dica
             </Button>
-            <Badge variant="outline" className="border-blue-600 text-blue-400">
+            <Badge variant="outline" className="border-pink-600 text-pink-400">
               <Clock className="w-4 h-4 mr-1" />
               {Math.floor(timeElapsed/60)}:{(timeElapsed%60).toString().padStart(2, '0')}
             </Badge>
-            <Badge variant="outline" className="border-yellow-600 text-yellow-400">
+            <Badge variant="outline" className="border-blue-600 text-blue-400">
               <Star className="w-4 h-4 mr-1" />
-              {score.toFixed(1)}/{questions.length} {/* Mostrar score com decimal */}
+              {score} Pontos
             </Badge>
           </div>
         </motion.div>
 
-        {/* Progress Bar */}
+        {showHint && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-4 p-3 bg-yellow-900/20 border border-yellow-700 rounded-lg text-center text-yellow-300"
+          >
+            <Lightbulb className="inline w-4 h-4 mr-1" /> {getHintText()}
+          </motion.div>
+        )}
+
         <motion.div 
           initial={{ opacity: 0, scaleX: 0 }}
           animate={{ opacity: 1, scaleX: 1 }}
@@ -330,7 +292,6 @@ export default function QuizHistoriaPage() {
           </p>
         </motion.div>
 
-        {/* Question Card */}
         <AnimatePresence mode="wait">
           <motion.div
             key={currentQuestion}
@@ -341,98 +302,101 @@ export default function QuizHistoriaPage() {
           >
             <Card className="bg-black/40 border-gray-800 backdrop-blur-xl mb-8">
               <CardHeader>
-                <CardTitle className="text-2xl text-white leading-relaxed">
-                  {questions[currentQuestion].question}
+                <CardTitle className="text-xl text-white text-center">
+                  {questions[currentQuestion]?.question}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {questions[currentQuestion].options.map((option, index) => (
+                {questions[currentQuestion] && [
+                  questions[currentQuestion].option_a,
+                  questions[currentQuestion].option_b,
+                  questions[currentQuestion].option_c,
+                  questions[currentQuestion].option_d
+                ].map((option, index) => (
                   <motion.button
                     key={index}
-                    onClick={() => !showResult && handleAnswerSelect(index)}
+                    onClick={() => handleAnswerSelect(index)}
                     disabled={showResult}
-                    whileHover={{ scale: showResult ? 1 : 1.02 }}
-                    whileTap={{ scale: 0.98 }}
                     className={`w-full p-4 text-left rounded-lg border transition-all duration-300 ${
-                      showResult
-                        ? index === questions[currentQuestion].correct
-                          ? 'bg-green-900/30 border-green-600 text-green-300'
-                          : index === selectedAnswer && selectedAnswer !== questions[currentQuestion].correct
-                          ? 'bg-red-900/30 border-red-600 text-red-300'
-                          : 'bg-gray-800/50 border-gray-700 text-gray-400'
-                        : selectedAnswer === index
-                        ? 'bg-blue-900/30 border-blue-600 text-blue-300'
-                        : 'bg-gray-800/50 border-gray-700 text-gray-300 hover:border-blue-600 hover:bg-blue-900/20'
+                      selectedAnswer === index
+                        ? 'bg-blue-600/20 border-blue-600 text-blue-300'
+                        : 'bg-gray-800/50 border-gray-700 text-gray-300 hover:bg-gray-700/50'
+                    } ${showResult && index === questions[currentQuestion].correct_answer
+                        ? 'bg-green-600/20 border-green-600 text-green-300'
+                        : showResult && selectedAnswer === index && index !== questions[currentQuestion].correct_answer
+                        ? 'bg-red-600/20 border-red-600 text-red-300'
+                        : ''
                     }`}
+                    whileHover={{ scale: showResult ? 1 : 1.02 }}
+                    whileTap={{ scale: showResult ? 1 : 0.98 }}
                   >
-                    <div className="flex items-center justify-between">
-                      <span>{option}</span>
-                      {showResult && (
-                        <div>
-                          {index === questions[currentQuestion].correct && (
-                            <CheckCircle className="w-5 h-5 text-green-500" />
-                          )}
-                          {index === selectedAnswer && selectedAnswer !== questions[currentQuestion].correct && (
-                            <XCircle className="w-5 h-5 text-red-500" />
-                          )}
-                        </div>
-                      )}
+                    <div className="flex items-center">
+                      <span className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-sm font-medium mr-3">
+                        {String.fromCharCode(65 + index)}
+                      </span>
+                      {option}
                     </div>
                   </motion.button>
                 ))}
+                {!showResult && (
+                  <Button 
+                    onClick={checkAnswer}
+                    disabled={selectedAnswer === null}
+                    className="w-full mt-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:scale-105"
+                  >
+                    Confirmar Resposta
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </motion.div>
         </AnimatePresence>
 
-        {/* Explanation & Hint */}
         <AnimatePresence>
-          {(showResult || showHintText) && (
+          {showResult && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
+              className="mb-8"
             >
-              <Card className={`mb-8 ${showResult ? (selectedAnswer === questions[currentQuestion].correct ? 'bg-gradient-to-r from-green-900/20 to-emerald-900/20 border-green-800/30' : 'bg-gradient-to-r from-red-900/20 to-pink-900/20 border-red-800/30') : 'bg-blue-900/20 border-blue-700/30'} backdrop-blur-xl`}>
-                <CardContent className="p-6">
-                  {showResult && (
-                    <>
-                      <h3 className={`text-lg font-semibold mb-2 ${selectedAnswer === questions[currentQuestion].correct ? 'text-green-300' : 'text-red-300'}`}>
-                        {selectedAnswer === questions[currentQuestion].correct ? "Correto! 🎉" : "Resposta Incorreta 📚"}
-                      </h3>
-                      <p className="text-gray-300 mb-2">{questions[currentQuestion].explanation}</p>
-                    </>
+              <Card className={`bg-gradient-to-r ${
+                selectedAnswer === questions[currentQuestion].correct_answer
+                  ? 'from-green-900/30 to-emerald-900/30 border-green-700'
+                  : 'from-red-900/30 to-pink-900/30 border-red-700'
+              } backdrop-blur-xl`}>
+                <CardContent className="p-6 text-center">
+                  <div className="flex items-center justify-center mb-2">
+                    {selectedAnswer === questions[currentQuestion].correct_answer ? (
+                      <CheckCircle className="w-8 h-8 text-green-400 mr-2" />
+                    ) : (
+                      <XCircle className="w-8 h-8 text-red-400 mr-2" />
+                    )}
+                    <h3 className={`text-xl font-semibold ${
+                      selectedAnswer === questions[currentQuestion].correct_answer
+                        ? 'text-green-300'
+                        : 'text-red-300'
+                    }`}>
+                      {selectedAnswer === questions[currentQuestion].correct_answer ? 'Correto!' : 'Incorreto!'}
+                    </h3>
+                  </div>
+                  <p className="text-gray-300 mb-4">
+                    {questions[currentQuestion].explanation}
+                  </p>
+                  {hintUsed && (
+                    <p className="text-xs text-yellow-400 mb-4">(Dica utilizada - pontuação reduzida)</p>
                   )}
-                  {showHintText && !showResult && (
-                     <>
-                      <h3 className="text-lg font-semibold text-purple-300 mb-2">Dica:</h3>
-                      <p className="text-gray-300">{questions[currentQuestion].hint}</p>
-                     </>
-                  )}
-                   {showResult && hintUsedThisQuestion && (
-                    <p className="text-xs text-purple-400 mt-2">(Dica utilizada nesta questão)</p>
-                  )}
+                  <Button 
+                    onClick={handleNextQuestion}
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:scale-105"
+                  >
+                    {currentQuestion < questions.length - 1 ? 'Próxima Pergunta' : 'Ver Resultado Final'}
+                  </Button>
                 </CardContent>
               </Card>
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Next Button */}
-        {selectedAnswer !== null && !showResult && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center"
-          >
-            <Button 
-              onClick={handleNextQuestion}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:scale-105 transition-all duration-300 px-8 py-3"
-            >
-              {currentQuestion < questions.length - 1 ? "Próxima Pergunta" : "Finalizar Quiz"}
-            </Button>
-          </motion.div>
-        )}
       </div>
     </div>
   );
