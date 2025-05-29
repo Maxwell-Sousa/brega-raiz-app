@@ -4,12 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { QuizScore } from "@/entities/QuizScore";
 import { TimelineEvent } from "@/entities/TimelineEvent";
-import { ArrowLeft, Calendar, Star, CheckCircle, XCircle, Trophy, RotateCcw, GripVertical, Award, HelpCircle, Share2 } from "lucide-react";
+import { ArrowLeft, Calendar, Star, CheckCircle, XCircle, Trophy, RotateCcw, GripVertical, Award, HelpCircle } from "lucide-react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ScoreShareCard } from "@/components/ScoreShareCard";
-import { shareScoreToInstagram } from "@/utils/shareScore";
 
 // Fallback events in case database is empty
 const fallbackEvents = [
@@ -176,10 +174,6 @@ export default function TimelineGamePage() {
     return `A história do brega tem seus segredos! Tente de novo!${hintMessage} 🧐`;
   };
 
-  const shareToInstagram = async () => {
-    await shareScoreToInstagram('score-share-card');
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6 flex items-center justify-center">
@@ -188,7 +182,7 @@ export default function TimelineGamePage() {
     );
   }
 
-  if (gameFinished && isCorrectOrder) {
+  if (gameFinished) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6 flex items-center justify-center">
         <motion.div
@@ -199,27 +193,18 @@ export default function TimelineGamePage() {
           <Card className="bg-black/40 border-gray-800 backdrop-blur-xl">
             <CardHeader className="text-center">
               <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-red-500 to-pink-600 rounded-full flex items-center justify-center">
-                <Award className="w-10 h-10 text-white" />
+                <Trophy className="w-10 h-10 text-white" />
               </div>
-              <CardTitle className="text-3xl text-white">Parabéns! Linha do Tempo Completa!</CardTitle>
+              <CardTitle className="text-3xl text-white">Jogo Finalizado!</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 text-center">
-              <div id="score-share-card" className="hidden">
-                <ScoreShareCard
-                  score={finalScoreToSave}
-                  totalQuestions={timelineEvents.length}
-                  timeElapsed={timeElapsed}
-                  gameType="timeline"
-                  playerName={playerName}
-                />
-              </div>
               <div className="grid grid-cols-3 gap-4">
-                 <div className="bg-gray-900/50 p-4 rounded-lg">
+                <div className="bg-gray-900/50 p-4 rounded-lg">
                   <div className="text-2xl font-bold text-red-400">{finalScoreToSave} / {timelineEvents.length}</div>
                   <div className="text-sm text-gray-400">Pontos Finais</div>
                 </div>
                 <div className="bg-gray-900/50 p-4 rounded-lg">
-                   <div className="text-2xl font-bold text-blue-400">{isCorrectOrder ? '100%' : `${Math.floor((score / timelineEvents.length) * 100)}%`}</div>
+                  <div className="text-2xl font-bold text-blue-400">{isCorrectOrder ? '100%' : `${Math.floor((score / timelineEvents.length) * 100)}%`}</div>
                   <div className="text-sm text-gray-400">Itens Corretos</div>
                 </div>
                 <div className="bg-gray-900/50 p-4 rounded-lg">
@@ -250,20 +235,17 @@ export default function TimelineGamePage() {
                     <Star className="w-4 h-4 mr-2" />
                     {scoreSaved ? "Pontuação Salva!" : "Salvar Pontuação"}
                   </Button>
-                  <Button 
-                    onClick={shareToInstagram}
-                    variant="outline" 
-                    className="flex-1 border-pink-600 text-pink-400 hover:bg-pink-600/10"
-                    disabled={!playerName.trim()}
-                  >
-                    <Share2 className="w-4 h-4 mr-2" />
-                    Compartilhar
+                  <Button onClick={restartQuiz} variant="outline" className="flex-1">
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Jogar Novamente
                   </Button>
                 </div>
-                <Button onClick={restartQuiz} variant="outline" className="flex-1">
-                  <RotateCcw className="w-4 h-4 mr-2" />
-                  Jogar Novamente
-                </Button>
+                <Link to={createPageUrl("Jogos")} className="flex-1">
+                  <Button variant="outline" className="w-full">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Voltar aos Jogos
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>

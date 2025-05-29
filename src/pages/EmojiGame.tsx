@@ -4,12 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { QuizScore } from "@/entities/QuizScore";
-import { ArrowLeft, Smile, Star, CheckCircle, XCircle, Trophy, RotateCcw, HelpCircle, Lightbulb, Share2 } from "lucide-react";
+import { ArrowLeft, Smile, Star, CheckCircle, XCircle, Trophy, RotateCcw, HelpCircle, Lightbulb } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ScoreShareCard } from "@/components/ScoreShareCard";
-import { shareScoreToInstagram } from "@/utils/shareScore";
 
 const emojiChallenges = [
   { emojis: "💔🍷🎶", answer: "Garçom", artist: "Reginaldo Rossi", explanation: "Coração partido, bebida e música — símbolos clássicos dessa canção icônica.", hint1: "Artista: Reginaldo Rossi", hint2: "Começa com 'G' e tem 6 letras." },
@@ -127,10 +125,6 @@ export default function DesafioEmojisPage() {
     return "Os emojis do brega te pegaram! 😂";
   };
 
-  const shareToInstagram = async () => {
-    await shareScoreToInstagram('score-share-card');
-  };
-
   if (gameFinished) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6 flex items-center justify-center">
@@ -144,18 +138,9 @@ export default function DesafioEmojisPage() {
               <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-full flex items-center justify-center">
                 <Trophy className="w-10 h-10 text-white" />
               </div>
-              <CardTitle className="text-3xl text-white">Desafio Finalizado!</CardTitle>
+              <CardTitle className="text-3xl text-white">Jogo Finalizado!</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 text-center">
-              <div id="score-share-card" className="hidden">
-                <ScoreShareCard
-                  score={score}
-                  totalQuestions={emojiChallenges.length * 2}
-                  timeElapsed={timeElapsed}
-                  gameType="emojis"
-                  playerName={playerName}
-                />
-              </div>
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-gray-900/50 p-4 rounded-lg">
                   <div className="text-2xl font-bold text-yellow-400">{score}</div>
@@ -176,44 +161,33 @@ export default function DesafioEmojisPage() {
               </div>
 
               <div className="space-y-4">
-                 <input
+                <input
                   type="text"
                   placeholder="Digite seu nome para salvar"
                   value={playerName}
                   onChange={(e) => setPlayerName(e.target.value)}
                   className="w-full p-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400"
                 />
-                <div className="grid grid-cols-2 gap-3">
+                <div className="flex gap-3">
                   <Button 
                     onClick={saveScore}
                     disabled={!playerName.trim() || scoreSaved}
-                    className="bg-gradient-to-r from-yellow-600 to-orange-600"
+                    className="flex-1 bg-gradient-to-r from-yellow-600 to-orange-600"
                   >
                     <Star className="w-4 h-4 mr-2" />
                     {scoreSaved ? "Pontuação Salva!" : "Salvar Pontuação"}
                   </Button>
-                  <Button 
-                    onClick={shareToInstagram}
-                    variant="outline" 
-                    className="border-pink-600 text-pink-400 hover:bg-pink-600/10"
-                    disabled={!playerName.trim()}
-                  >
-                    <Share2 className="w-4 h-4 mr-2" />
-                    Compartilhar
-                  </Button>
-                </div>
-                <div className="flex gap-3">
                   <Button onClick={restartQuiz} variant="outline" className="flex-1">
                     <RotateCcw className="w-4 h-4 mr-2" />
                     Jogar Novamente
                   </Button>
-                  <Link to={createPageUrl("Jogos")} className="flex-1">
-                    <Button variant="outline" className="w-full">
-                      <ArrowLeft className="w-4 h-4 mr-2" />
-                      Voltar aos Jogos
-                    </Button>
-                  </Link>
                 </div>
+                <Link to={createPageUrl("Jogos")} className="flex-1">
+                  <Button variant="outline" className="w-full">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Voltar aos Jogos
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>

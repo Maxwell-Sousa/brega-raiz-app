@@ -4,12 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { QuizScore } from "@/entities/QuizScore";
 import { QuizQuestion } from "@/entities/QuizQuestion";
-import { ArrowLeft, Clock, Star, CheckCircle, XCircle, Trophy, RotateCcw, Lightbulb, Share2 } from "lucide-react";
+import { ArrowLeft, Clock, Star, CheckCircle, XCircle, Trophy, RotateCcw, Lightbulb } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { shareScoreToInstagram } from "@/utils/shareScore";
-import { ScoreShareCard } from "@/components/ScoreShareCard";
 
 // Fallback questions in case database is empty
 const fallbackQuestions = [
@@ -155,15 +153,6 @@ export default function QuizGamePage() {
     return "Que tal explorar mais sobre a história do brega? 🎵";
   };
 
-  const shareToInstagram = async () => {
-    try {
-      await shareScoreToInstagram('score-share-card');
-    } catch (error) {
-      console.error('Erro ao compartilhar:', error);
-      alert('Não foi possível compartilhar a pontuação. Tente novamente mais tarde.');
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6 flex items-center justify-center">
@@ -215,46 +204,26 @@ export default function QuizGamePage() {
                   onChange={(e) => setPlayerName(e.target.value)}
                   className="w-full p-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400"
                 />
-                <div className="grid grid-cols-2 gap-3">
+                <div className="flex gap-3">
                   <Button 
                     onClick={saveScore}
                     disabled={!playerName.trim() || scoreSaved}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600"
                   >
                     <Star className="w-4 h-4 mr-2" />
                     {scoreSaved ? "Pontuação Salva!" : "Salvar Pontuação"}
                   </Button>
-                  <Button 
-                    onClick={shareToInstagram}
-                    variant="outline" 
-                    className="border-pink-600 text-pink-400 hover:bg-pink-600/10"
-                  >
-                    <Share2 className="w-4 h-4 mr-2" />
-                    Compartilhar
-                  </Button>
-                </div>
-                <div className="flex gap-3">
                   <Button onClick={restartQuiz} variant="outline" className="flex-1">
                     <RotateCcw className="w-4 h-4 mr-2" />
                     Jogar Novamente
                   </Button>
-                  <Link to={createPageUrl("Jogos")} className="flex-1">
-                    <Button variant="outline" className="w-full">
-                      <ArrowLeft className="w-4 h-4 mr-2" />
-                      Voltar aos Jogos
-                    </Button>
-                  </Link>
                 </div>
-              </div>
-
-              <div id="score-share-card" className="hidden">
-                <ScoreShareCard
-                  score={score}
-                  totalQuestions={questions.length * 2}
-                  timeElapsed={timeElapsed}
-                  gameType="quiz"
-                  playerName={playerName}
-                />
+                <Link to={createPageUrl("Jogos")} className="flex-1">
+                  <Button variant="outline" className="w-full">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Voltar aos Jogos
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
