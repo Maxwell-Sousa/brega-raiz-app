@@ -8,6 +8,8 @@ import { ArrowLeft, Clock, Star, CheckCircle, XCircle, Trophy, RotateCcw, Lightb
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { shareScoreToInstagram } from "@/utils/shareScore";
+import { ScoreShareCard } from "@/components/ScoreShareCard";
 
 // Fallback questions in case database is empty
 const fallbackQuestions = [
@@ -153,9 +155,13 @@ export default function QuizGamePage() {
     return "Que tal explorar mais sobre a história do brega? 🎵";
   };
 
-  const shareToInstagram = () => {
-    // Placeholder function - não faz nada por enquanto
-    console.log("Compartilhar no Instagram - funcionalidade em desenvolvimento");
+  const shareToInstagram = async () => {
+    try {
+      await shareScoreToInstagram('score-share-card');
+    } catch (error) {
+      console.error('Erro ao compartilhar:', error);
+      alert('Não foi possível compartilhar a pontuação. Tente novamente mais tarde.');
+    }
   };
 
   if (loading) {
@@ -239,6 +245,16 @@ export default function QuizGamePage() {
                     </Button>
                   </Link>
                 </div>
+              </div>
+
+              <div id="score-share-card" className="hidden">
+                <ScoreShareCard
+                  score={score}
+                  totalQuestions={questions.length * 2}
+                  timeElapsed={timeElapsed}
+                  gameType="quiz"
+                  playerName={playerName}
+                />
               </div>
             </CardContent>
           </Card>
