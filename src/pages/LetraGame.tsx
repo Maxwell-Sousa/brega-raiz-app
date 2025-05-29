@@ -8,6 +8,8 @@ import { ArrowLeft, Music, Star, CheckCircle, XCircle, Trophy, RotateCcw, Lightb
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { ScoreShareCard } from "@/components/ScoreShareCard";
+import { shareScoreToInstagram } from "@/utils/shareScore";
 
 const phrases = [
   {
@@ -83,6 +85,7 @@ export default function CompleteLetraPage() {
   const [playerName, setPlayerName] = useState("");
   const [hintUsedThisPhrase, setHintUsedThisPhrase] = useState(false);
   const [showHintText, setShowHintText] = useState(false);
+  const [scoreSaved, setScoreSaved] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -125,15 +128,16 @@ export default function CompleteLetraPage() {
   };
 
   const saveScore = async () => {
-    if (playerName.trim()) {
+    if (playerName.trim() && !scoreSaved) {
       try {
         await QuizScore.create({
           player_name: playerName,
           quiz_type: "letras",
           score: score,
-          total_questions: phrases.length, // Total de pontos possíveis sem dicas
+          total_questions: phrases.length,
           completion_time: timeElapsed
         });
+        setScoreSaved(true);
       } catch (error) {
         console.error("Erro ao salvar pontuação:", error);
       }
@@ -161,9 +165,8 @@ export default function CompleteLetraPage() {
     return "Ops! Parece que o brega ainda é um mistério! 🤔";
   };
 
-  const shareToInstagram = () => {
-    // Placeholder function - não faz nada por enquanto
-    console.log("Compartilhar no Instagram - funcionalidade em desenvolvimento");
+  const shareToInstagram = async () => {
+    await shareScoreToInstagram('score-share-card');
   };
 
   if (gameFinished) {
@@ -182,9 +185,18 @@ export default function CompleteLetraPage() {
               <CardTitle className="text-3xl text-white">Jogo Finalizado!</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 text-center">
+              <div id="score-share-card" className="hidden">
+                <ScoreShareCard
+                  score={score}
+                  totalQuestions={phrases.length}
+                  timeElapsed={timeElapsed}
+                  gameType="letras"
+                  playerName={playerName}
+                />
+              </div>
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-gray-900/50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-green-400">{score.toFixed(1)}</div> {/* Mostrar score com decimal */}
+                  <div className="text-2xl font-bold text-green-400">{score.toFixed(1)}</div>
                   <div className="text-sm text-gray-400">Pontos</div>
                 </div>
                 <div className="bg-gray-900/50 p-4 rounded-lg">
@@ -212,16 +224,17 @@ export default function CompleteLetraPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <Button
                     onClick={saveScore}
-                    disabled={!playerName.trim()}
+                    disabled={!playerName.trim() || scoreSaved}
                     className="bg-gradient-to-r from-green-600 to-emerald-600"
                   >
                     <Star className="w-4 h-4 mr-2" />
-                    Salvar Pontuação
+                    {scoreSaved ? "Pontuação Salva!" : "Salvar Pontuação"}
                   </Button>
                   <Button 
                     onClick={shareToInstagram}
                     variant="outline" 
                     className="border-pink-600 text-pink-400 hover:bg-pink-600/10"
+                    disabled={!playerName.trim()}
                   >
                     <Share2 className="w-4 h-4 mr-2" />
                     Compartilhar

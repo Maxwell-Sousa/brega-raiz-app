@@ -1,7 +1,6 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Github, Music, Palette, Database, Book } from "lucide-react";
+import { Heart, Github, Music, Palette } from "lucide-react";
 
 const Creditos = () => {
   const teamMembers = [
@@ -25,33 +24,6 @@ const Creditos = () => {
       description: "Criação da identidade visual e interface do usuário",
       icon: Palette,
       color: "from-yellow-600 to-yellow-700"
-    }
-  ];
-
-  const sources = [
-    {
-      title: "Arquivo Nacional",
-      description: "Documentos históricos sobre a música popular brasileira",
-      type: "Fonte Oficial",
-      color: "bg-yellow-600"
-    },
-    {
-      title: "Fundação Biblioteca Nacional",
-      description: "Periódicos e publicações sobre cultura musical",
-      type: "Biblioteca",
-      color: "bg-yellow-600"
-    },
-    {
-      title: "Instituto Memória Musical Brasileira",
-      description: "Acervo digital de músicas e biografias de artistas",
-      type: "Acervo Digital",
-      color: "bg-yellow-600"
-    },
-    {
-      title: "Discografias Oficiais",
-      description: "Catálogos oficiais dos principais artistas do brega",
-      type: "Discografia",
-      color: "bg-yellow-600"
     }
   ];
 
@@ -106,27 +78,8 @@ const Creditos = () => {
         </div>
       </div>
 
-      {/* Sources Section */}
+      {/* Special Thanks */}
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl font-bold text-yellow-400 text-center mb-8">Fontes e Referências</h2>
-        
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {sources.map((source, index) => (
-            <Card key={index} className="bg-gray-800/50 border-gray-700">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-lg font-bold text-white">{source.title}</h3>
-                  <Badge className={`${source.color} text-white text-xs`}>
-                    {source.type}
-                  </Badge>
-                </div>
-                <p className="text-gray-400 text-sm">{source.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Special Thanks */}
         <Card className="bg-gradient-to-r from-red-900/20 via-orange-900/20 to-yellow-900/20 border-orange-700/30">
           <CardContent className="p-8 text-center">
             <h2 className="text-2xl font-bold text-yellow-400 mb-4">Agradecimentos Especiais</h2>

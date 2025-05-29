@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -118,8 +117,12 @@ export default function Layout({ children }: LayoutProps) {
         <Sidebar className="border-r border-gray-800 !bg-black backdrop-blur-xl">
           <SidebarHeader className="border-b border-gray-800 p-6 !bg-black">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 brega-gradient rounded-xl flex items-center justify-center shadow-lg">
-                <Music className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 brega-gradient rounded-xl flex items-center justify-center shadow-lg overflow-hidden">
+                <img 
+                  src="/ChatGPT Image 15 de mai. de 2025, 19_59_38.png" 
+                  alt="Logo Só Há Brega" 
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div>
                 <h2 className="font-bold text-xl brega-text-gradient">Só Há Brega</h2>

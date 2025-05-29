@@ -8,6 +8,8 @@ import { ArrowLeft, Smile, Star, CheckCircle, XCircle, Trophy, RotateCcw, HelpCi
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { ScoreShareCard } from "@/components/ScoreShareCard";
+import { shareScoreToInstagram } from "@/utils/shareScore";
 
 const emojiChallenges = [
   { emojis: "💔🍷🎶", answer: "Garçom", artist: "Reginaldo Rossi", explanation: "Coração partido, bebida e música — símbolos clássicos dessa canção icônica.", hint1: "Artista: Reginaldo Rossi", hint2: "Começa com 'G' e tem 6 letras." },
@@ -34,6 +36,7 @@ export default function DesafioEmojisPage() {
   const [gameFinished, setGameFinished] = useState(false);
   const [playerName, setPlayerName] = useState("");
   const [showHintText, setShowHintText] = useState("");
+  const [scoreSaved, setScoreSaved] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -85,7 +88,7 @@ export default function DesafioEmojisPage() {
   };
   
   const saveScore = async () => {
-    if (playerName.trim()) {
+    if (playerName.trim() && !scoreSaved) {
       try {
         await QuizScore.create({
           player_name: playerName,
@@ -94,6 +97,7 @@ export default function DesafioEmojisPage() {
           total_questions: emojiChallenges.length * 2,
           completion_time: timeElapsed
         });
+        setScoreSaved(true);
       } catch (error) {
         console.error("Erro ao salvar pontuação:", error);
       }
@@ -123,9 +127,8 @@ export default function DesafioEmojisPage() {
     return "Os emojis do brega te pegaram! 😂";
   };
 
-  const shareToInstagram = () => {
-    // Placeholder function - não faz nada por enquanto
-    console.log("Compartilhar no Instagram - funcionalidade em desenvolvimento");
+  const shareToInstagram = async () => {
+    await shareScoreToInstagram('score-share-card');
   };
 
   if (gameFinished) {
@@ -144,7 +147,16 @@ export default function DesafioEmojisPage() {
               <CardTitle className="text-3xl text-white">Desafio Finalizado!</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 text-center">
-             <div className="grid grid-cols-3 gap-4">
+              <div id="score-share-card" className="hidden">
+                <ScoreShareCard
+                  score={score}
+                  totalQuestions={emojiChallenges.length * 2}
+                  timeElapsed={timeElapsed}
+                  gameType="emojis"
+                  playerName={playerName}
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-4">
                 <div className="bg-gray-900/50 p-4 rounded-lg">
                   <div className="text-2xl font-bold text-yellow-400">{score}</div>
                   <div className="text-sm text-gray-400">Pontos</div>
@@ -174,16 +186,17 @@ export default function DesafioEmojisPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <Button 
                     onClick={saveScore}
-                    disabled={!playerName.trim()}
+                    disabled={!playerName.trim() || scoreSaved}
                     className="bg-gradient-to-r from-yellow-600 to-orange-600"
                   >
                     <Star className="w-4 h-4 mr-2" />
-                    Salvar Pontuação
+                    {scoreSaved ? "Pontuação Salva!" : "Salvar Pontuação"}
                   </Button>
                   <Button 
                     onClick={shareToInstagram}
                     variant="outline" 
                     className="border-pink-600 text-pink-400 hover:bg-pink-600/10"
+                    disabled={!playerName.trim()}
                   >
                     <Share2 className="w-4 h-4 mr-2" />
                     Compartilhar

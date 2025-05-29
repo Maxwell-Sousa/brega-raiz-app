@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -44,8 +43,12 @@ export default function HomePage() {
         >
           <div className="flex justify-center mb-6">
             <div className="relative">
-              <div className="w-20 h-20 bg-gradient-to-r from-red-800 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl">
-                <Music className="w-10 h-10 text-white" />
+              <div className="w-20 h-20 bg-gradient-to-r from-red-800 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl overflow-hidden">
+                <img 
+                  src="/ChatGPT Image 15 de mai. de 2025, 19_59_38.png" 
+                  alt="Logo Só Há Brega" 
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-black" />

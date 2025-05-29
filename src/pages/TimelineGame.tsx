@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { QuizScore } from "@/entities/QuizScore";
 import { TimelineEvent } from "@/entities/TimelineEvent";
-import { ArrowLeft, Calendar, Star, CheckCircle, XCircle, Trophy, RotateCcw, GripVertical, Award, HelpCircle } from "lucide-react";
+import { ArrowLeft, Calendar, Star, CheckCircle, XCircle, Trophy, RotateCcw, GripVertical, Award, HelpCircle, Share2 } from "lucide-react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { ScoreShareCard } from "@/components/ScoreShareCard";
+import { shareScoreToInstagram } from "@/utils/shareScore";
 
 // Fallback events in case database is empty
 const fallbackEvents = [
@@ -39,6 +41,7 @@ export default function TimelineGamePage() {
   const [hintUsed, setHintUsed] = useState(false);
   const [hintText, setHintText] = useState("");
   const [loading, setLoading] = useState(true);
+  const [scoreSaved, setScoreSaved] = useState(false);
 
   useEffect(() => {
     const loadTimelineEvents = async () => {
@@ -136,15 +139,16 @@ export default function TimelineGamePage() {
   };
 
   const saveScore = async () => {
-    if (playerName.trim()) {
+    if (playerName.trim() && !scoreSaved) {
       try {
         await QuizScore.create({
           player_name: playerName,
           quiz_type: "timeline",
           score: finalScoreToSave,
-          total_questions: timelineEvents.length, 
+          total_questions: timelineEvents.length,
           completion_time: timeElapsed
         });
+        setScoreSaved(true);
       } catch (error) {
         console.error("Erro ao salvar pontuação:", error);
       }
@@ -172,6 +176,10 @@ export default function TimelineGamePage() {
     return `A história do brega tem seus segredos! Tente de novo!${hintMessage} 🧐`;
   };
 
+  const shareToInstagram = async () => {
+    await shareScoreToInstagram('score-share-card');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6 flex items-center justify-center">
@@ -196,6 +204,15 @@ export default function TimelineGamePage() {
               <CardTitle className="text-3xl text-white">Parabéns! Linha do Tempo Completa!</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 text-center">
+              <div id="score-share-card" className="hidden">
+                <ScoreShareCard
+                  score={finalScoreToSave}
+                  totalQuestions={timelineEvents.length}
+                  timeElapsed={timeElapsed}
+                  gameType="timeline"
+                  playerName={playerName}
+                />
+              </div>
               <div className="grid grid-cols-3 gap-4">
                  <div className="bg-gray-900/50 p-4 rounded-lg">
                   <div className="text-2xl font-bold text-red-400">{finalScoreToSave} / {timelineEvents.length}</div>
@@ -227,23 +244,26 @@ export default function TimelineGamePage() {
                 <div className="flex gap-3">
                   <Button 
                     onClick={saveScore}
-                    disabled={!playerName.trim()}
+                    disabled={!playerName.trim() || scoreSaved}
                     className="flex-1 bg-gradient-to-r from-red-600 to-pink-600"
                   >
                     <Star className="w-4 h-4 mr-2" />
-                    Salvar Pontuação
+                    {scoreSaved ? "Pontuação Salva!" : "Salvar Pontuação"}
                   </Button>
-                  <Button onClick={restartQuiz} variant="outline" className="flex-1">
-                    <RotateCcw className="w-4 h-4 mr-2" />
-                    Jogar Novamente
+                  <Button 
+                    onClick={shareToInstagram}
+                    variant="outline" 
+                    className="flex-1 border-pink-600 text-pink-400 hover:bg-pink-600/10"
+                    disabled={!playerName.trim()}
+                  >
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Compartilhar
                   </Button>
                 </div>
-                <Link to={createPageUrl("Jogos")}>
-                  <Button variant="outline" className="w-full">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Voltar aos Jogos
-                  </Button>
-                </Link>
+                <Button onClick={restartQuiz} variant="outline" className="flex-1">
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Jogar Novamente
+                </Button>
               </div>
             </CardContent>
           </Card>

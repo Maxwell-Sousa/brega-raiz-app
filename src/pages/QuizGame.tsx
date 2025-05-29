@@ -43,6 +43,7 @@ export default function QuizGamePage() {
   const [hintUsed, setHintUsed] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [scoreSaved, setScoreSaved] = useState(false);
 
   useEffect(() => {
     const loadQuestions = async () => {
@@ -115,7 +116,7 @@ export default function QuizGamePage() {
   };
 
   const saveScore = async () => {
-    if (playerName.trim()) {
+    if (playerName.trim() && !scoreSaved) {
       try {
         await QuizScore.create({
           player_name: playerName,
@@ -124,6 +125,7 @@ export default function QuizGamePage() {
           total_questions: questions.length * 2,
           completion_time: timeElapsed
         });
+        setScoreSaved(true);
       } catch (error) {
         console.error("Erro ao salvar pontuação:", error);
       }
@@ -210,11 +212,11 @@ export default function QuizGamePage() {
                 <div className="grid grid-cols-2 gap-3">
                   <Button 
                     onClick={saveScore}
-                    disabled={!playerName.trim()}
+                    disabled={!playerName.trim() || scoreSaved}
                     className="bg-gradient-to-r from-blue-600 to-purple-600"
                   >
                     <Star className="w-4 h-4 mr-2" />
-                    Salvar Pontuação
+                    {scoreSaved ? "Pontuação Salva!" : "Salvar Pontuação"}
                   </Button>
                   <Button 
                     onClick={shareToInstagram}
