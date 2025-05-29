@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,26 +16,6 @@ interface EraData {
   artists: string[];
   landmarks: string[];
 }
-
-// Fallback data in case database is empty
-const fallbackEras: Record<string, EraData> = {
-  origem: {
-    title: "Origens (1960s)",
-    period: "Final dos anos 1960",
-    description: "O nascimento de uma expressão musical que mudaria para sempre a cultura brasileira",
-    content: `O brega nasceu no Brasil no final da década de 1960, em um período de intensa transformação social, política e cultural. Durante a Ditadura Militar, a industrialização acelerada e o êxodo rural, surgiu esta expressão musical das camadas populares.
-
-O termo "brega" inicialmente era uma gíria pejorativa, associada a locais populares de baixa renda como cabarés e boates. Ironicamente, foi justamente nestes espaços que nasceu um dos gêneros mais autênticos da música brasileira.
-
-Caracterizado por letras simples e diretas sobre amor, traição, dor e saudade, o brega trazia melodias marcantes e sentimentais, com forte influência da música romântica latino-americana e do bolero.`,
-    artists: ["Nelson Ned", "Reginaldo Rossi", "Waldick Soriano"],
-    landmarks: [
-      "Surgimento nos cabarés e boates populares",
-      "Primeira geração de artistas bregas",
-      "Influência do bolero e música romântica latina"
-    ]
-  }
-};
 
 export default function HistoriaPage() {
   const [selectedEra, setSelectedEra] = useState("origem");
@@ -60,14 +41,15 @@ export default function HistoriaPage() {
             };
           });
           setEras(erasObject);
-        } else {
-          // Use fallback data if database is empty
-          setEras(fallbackEras);
+          
+          // Set first era as selected if origem doesn't exist
+          const eraKeys = Object.keys(erasObject);
+          if (eraKeys.length > 0 && !erasObject['origem']) {
+            setSelectedEra(eraKeys[0]);
+          }
         }
       } catch (error) {
         console.error('Error loading historia content:', error);
-        // Use fallback data on error
-        setEras(fallbackEras);
       } finally {
         setLoading(false);
       }
@@ -138,7 +120,18 @@ export default function HistoriaPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6 flex items-center justify-center">
-        <div className="text-white">Carregando conteúdo histórico...</div>
+        <div className="text-white text-xl">Carregando história do brega...</div>
+      </div>
+    );
+  }
+
+  if (Object.keys(eras).length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6 flex items-center justify-center">
+        <div className="text-center text-white">
+          <h2 className="text-2xl font-bold mb-4">Nenhum conteúdo histórico encontrado</h2>
+          <p className="text-gray-400">Verifique se os dados foram carregados corretamente no banco de dados.</p>
+        </div>
       </div>
     );
   }
