@@ -2,7 +2,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Home, BookOpen, Gamepad2, Users, Music, Star, Trophy } from "lucide-react";
+import { Home, BookOpen, Gamepad2, Users, Music } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -150,16 +150,6 @@ export default function Layout({ children }: LayoutProps) {
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
-
-            <div className="mt-8 p-4 glass-effect rounded-xl">
-              <div className="flex items-center gap-2 mb-3">
-                <Star className="w-4 h-4 text-yellow-400" />
-                <span className="text-sm font-medium text-gray-300">Destaque</span>
-              </div>
-              <p className="text-xs text-gray-400 leading-relaxed">
-                Explore a rica história do brega brasileiro através de jogos interativos e conteúdo educativo.
-              </p>
-            </div>
           </SidebarContent>
         </Sidebar>
 

@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { QuizScore } from "@/entities/QuizScore";
-import { ArrowLeft, Music, Star, CheckCircle, XCircle, Trophy, RotateCcw, Lightbulb } from "lucide-react";
+import { ArrowLeft, Music, Star, CheckCircle, XCircle, Trophy, RotateCcw, Lightbulb, Share2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -162,6 +161,11 @@ export default function CompleteLetraPage() {
     return "Ops! Parece que o brega ainda é um mistério! 🤔";
   };
 
+  const shareToInstagram = () => {
+    // Placeholder function - não faz nada por enquanto
+    console.log("Compartilhar no Instagram - funcionalidade em desenvolvimento");
+  };
+
   if (gameFinished) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6 flex items-center justify-center">
@@ -205,26 +209,36 @@ export default function CompleteLetraPage() {
                   onChange={(e) => setPlayerName(e.target.value)}
                   className="w-full p-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white placeholder-gray-400"
                 />
-                <div className="flex gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   <Button
                     onClick={saveScore}
                     disabled={!playerName.trim()}
-                    className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600"
+                    className="bg-gradient-to-r from-green-600 to-emerald-600"
                   >
                     <Star className="w-4 h-4 mr-2" />
                     Salvar Pontuação
                   </Button>
+                  <Button 
+                    onClick={shareToInstagram}
+                    variant="outline" 
+                    className="border-pink-600 text-pink-400 hover:bg-pink-600/10"
+                  >
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Compartilhar
+                  </Button>
+                </div>
+                <div className="flex gap-3">
                   <Button onClick={restartQuiz} variant="outline" className="flex-1">
                     <RotateCcw className="w-4 h-4 mr-2" />
                     Jogar Novamente
                   </Button>
+                  <Link to={createPageUrl("Jogos")} className="flex-1">
+                    <Button variant="outline" className="w-full">
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Voltar aos Jogos
+                    </Button>
+                  </Link>
                 </div>
-                <Link to={createPageUrl("Jogos")}>
-                  <Button variant="outline" className="w-full">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Voltar aos Jogos
-                  </Button>
-                </Link>
               </div>
             </CardContent>
           </Card>
@@ -321,7 +335,6 @@ export default function CompleteLetraPage() {
             </Card>
           </motion.div>
         </AnimatePresence>
-
 
         <AnimatePresence>
           {(showResult || showHintText) && (
