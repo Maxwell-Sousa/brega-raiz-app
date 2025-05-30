@@ -209,6 +209,26 @@ export default function QuizGamePage() {
     return "Que tal explorar mais sobre a história do brega? 🎵";
   };
 
+  const handleInstagramShare = async () => {
+    if (!playerName.trim()) {
+      alert('Digite seu nome primeiro para compartilhar!');
+      return;
+    }
+
+    setIsSharing(true);
+    try {
+      await shareToInstagramStory(
+        playerName,
+        score,
+        'quiz',
+        timeElapsed,
+        questions.length * 2
+      );
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6 flex items-center justify-center">
