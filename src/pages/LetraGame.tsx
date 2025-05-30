@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { QuizScore } from "@/entities/QuizScore";
-import { ArrowLeft, Music, Star, CheckCircle, XCircle, Trophy, RotateCcw, Lightbulb } from "lucide-react";
+import { ArrowLeft, Music, Star, CheckCircle, XCircle, Trophy, RotateCcw, Lightbulb, Instagram } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { shareToInstagramStory } from "@/utils/shareUtils";
 
 const phrases = [
   {
@@ -84,6 +85,7 @@ export default function CompleteLetraPage() {
   const [hintUsedThisPhrase, setHintUsedThisPhrase] = useState(false);
   const [showHintText, setShowHintText] = useState(false);
   const [scoreSaved, setScoreSaved] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -163,6 +165,26 @@ export default function CompleteLetraPage() {
     return "Ops! Parece que o brega ainda é um mistério! 🤔";
   };
 
+  const handleInstagramShare = async () => {
+    if (!playerName.trim()) {
+      alert('Digite seu nome primeiro para compartilhar!');
+      return;
+    }
+
+    setIsSharing(true);
+    try {
+      await shareToInstagramStory(
+        playerName,
+        score,
+        'letras',
+        timeElapsed,
+        phrases.length
+      );
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
   if (gameFinished) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6 flex items-center justify-center">
@@ -220,6 +242,14 @@ export default function CompleteLetraPage() {
                     Jogar Novamente
                   </Button>
                 </div>
+                <Button
+                  onClick={handleInstagramShare}
+                  disabled={!playerName.trim() || isSharing}
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                >
+                  <Instagram className="w-4 h-4 mr-2" />
+                  {isSharing ? "Gerando imagem..." : "Compartilhar no Instagram"}
+                </Button>
                 <Link to={createPageUrl("Jogos")} className="flex-1">
                   <Button variant="outline" className="w-full">
                     <ArrowLeft className="w-4 h-4 mr-2" />

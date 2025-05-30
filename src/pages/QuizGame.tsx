@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { QuizScore } from "@/entities/QuizScore";
 import { QuizQuestion } from "@/entities/QuizQuestion";
-import { ArrowLeft, Clock, Star, CheckCircle, XCircle, Trophy, RotateCcw, Lightbulb } from "lucide-react";
+import { ArrowLeft, Clock, Star, CheckCircle, XCircle, Trophy, RotateCcw, Lightbulb, Instagram } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { shareToInstagramStory } from "@/utils/shareUtils";
 
 // Fallback questions in case database is empty
 const fallbackQuestions = [
@@ -44,16 +45,71 @@ export default function QuizGamePage() {
   const [showHint, setShowHint] = useState(false);
   const [loading, setLoading] = useState(true);
   const [scoreSaved, setScoreSaved] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
 
   useEffect(() => {
     const loadQuestions = async () => {
       try {
         const data = await QuizQuestion.getAll();
+        let questionsToUse = [];
+        
         if (data && data.length > 0) {
-          setQuestions(data);
+          // Embaralhar e selecionar apenas 10 perguntas de 15
+          const shuffled = [...data].sort(() => Math.random() - 0.5);
+          questionsToUse = shuffled.slice(0, Math.min(10, shuffled.length));
+          
+          // Embaralhar também as alternativas de cada pergunta
+          questionsToUse = questionsToUse.map(question => {
+            const options = [
+              { text: question.option_a, index: 0 },
+              { text: question.option_b, index: 1 },
+              { text: question.option_c, index: 2 },
+              { text: question.option_d, index: 3 }
+            ];
+            
+            // Embaralhar as opções
+            const shuffledOptions = [...options].sort(() => Math.random() - 0.5);
+            
+            // Encontrar onde a resposta correta ficou após o embaralhamento
+            const newCorrectIndex = shuffledOptions.findIndex(option => option.index === question.correct_answer);
+            
+            return {
+              ...question,
+              option_a: shuffledOptions[0].text,
+              option_b: shuffledOptions[1].text,
+              option_c: shuffledOptions[2].text,
+              option_d: shuffledOptions[3].text,
+              correct_answer: newCorrectIndex
+            };
+          });
+          
+          setQuestions(questionsToUse);
         } else {
           console.log('No questions found in database, using fallback questions');
-          setQuestions(fallbackQuestions);
+          // Embaralhar fallback questions também
+          const shuffledFallback = [...fallbackQuestions].sort(() => Math.random() - 0.5);
+          questionsToUse = shuffledFallback.map(question => {
+            const options = [
+              { text: question.option_a, index: 0 },
+              { text: question.option_b, index: 1 },
+              { text: question.option_c, index: 2 },
+              { text: question.option_d, index: 3 }
+            ];
+            
+            const shuffledOptions = [...options].sort(() => Math.random() - 0.5);
+            const newCorrectIndex = shuffledOptions.findIndex(option => option.index === question.correct_answer);
+            
+            return {
+              ...question,
+              option_a: shuffledOptions[0].text,
+              option_b: shuffledOptions[1].text,
+              option_c: shuffledOptions[2].text,
+              option_d: shuffledOptions[3].text,
+              correct_answer: newCorrectIndex
+            };
+          });
+          
+          setQuestions(questionsToUse);
         }
       } catch (error) {
         console.error('Error loading questions:', error);
@@ -218,6 +274,14 @@ export default function QuizGamePage() {
                     Jogar Novamente
                   </Button>
                 </div>
+                <Button
+                  onClick={handleInstagramShare}
+                  disabled={!playerName.trim() || isSharing}
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                >
+                  <Instagram className="w-4 h-4 mr-2" />
+                  {isSharing ? "Gerando imagem..." : "Compartilhar no Instagram"}
+                </Button>
                 <Link to={createPageUrl("Jogos")} className="flex-1">
                   <Button variant="outline" className="w-full">
                     <ArrowLeft className="w-4 h-4 mr-2" />

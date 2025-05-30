@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { QuizScore } from "@/entities/QuizScore";
 import { TimelineEvent } from "@/entities/TimelineEvent";
-import { ArrowLeft, Calendar, Star, CheckCircle, XCircle, Trophy, RotateCcw, GripVertical, Award, HelpCircle } from "lucide-react";
+import { ArrowLeft, Calendar, Star, CheckCircle, XCircle, Trophy, RotateCcw, GripVertical, Award, HelpCircle, Instagram } from "lucide-react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { shareToInstagramStory } from "@/utils/shareUtils";
 
 // Fallback events in case database is empty
 const fallbackEvents = [
@@ -40,30 +41,37 @@ export default function TimelineGamePage() {
   const [hintText, setHintText] = useState("");
   const [loading, setLoading] = useState(true);
   const [scoreSaved, setScoreSaved] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
 
   useEffect(() => {
     const loadTimelineEvents = async () => {
       try {
         const data = await TimelineEvent.getAll();
         if (data && data.length > 0) {
-          // Convert database format to game format
-          const events = data.map(event => ({
+          // Convert database format to game format and shuffle
+          let events = data.map(event => ({
             id: event.id,
             year: event.year,
             event: event.event_title,
             explanation: event.description
           }));
+          
+          // Embaralhar os eventos
+          events = shuffleArray([...events]);
+          
           setTimelineEvents(events);
           setOrderedEvents(shuffleArray([...events]));
         } else {
           console.log('No timeline events found in database, using fallback events');
-          setTimelineEvents(fallbackEvents);
-          setOrderedEvents(shuffleArray([...fallbackEvents]));
+          const shuffledFallback = shuffleArray([...fallbackEvents]);
+          setTimelineEvents(shuffledFallback);
+          setOrderedEvents(shuffleArray([...shuffledFallback]));
         }
       } catch (error) {
         console.error('Error loading timeline events:', error);
-        setTimelineEvents(fallbackEvents);
-        setOrderedEvents(shuffleArray([...fallbackEvents]));
+        const shuffledFallback = shuffleArray([...fallbackEvents]);
+        setTimelineEvents(shuffledFallback);
+        setOrderedEvents(shuffleArray([...shuffledFallback]));
       } finally {
         setLoading(false);
       }
@@ -240,6 +248,14 @@ export default function TimelineGamePage() {
                     Jogar Novamente
                   </Button>
                 </div>
+                <Button
+                  onClick={handleInstagramShare}
+                  disabled={!playerName.trim() || isSharing}
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                >
+                  <Instagram className="w-4 h-4 mr-2" />
+                  {isSharing ? "Gerando imagem..." : "Compartilhar no Instagram"}
+                </Button>
                 <Link to={createPageUrl("Jogos")} className="flex-1">
                   <Button variant="outline" className="w-full">
                     <ArrowLeft className="w-4 h-4 mr-2" />

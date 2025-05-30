@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { QuizScore } from "@/entities/QuizScore";
-import { ArrowLeft, Smile, Star, CheckCircle, XCircle, Trophy, RotateCcw, HelpCircle, Lightbulb } from "lucide-react";
+import { ArrowLeft, Smile, Star, CheckCircle, XCircle, Trophy, RotateCcw, HelpCircle, Lightbulb, Instagram } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { shareToInstagramStory } from "@/utils/shareUtils";
 
 const emojiChallenges = [
   { emojis: "💔🍷🎶", answer: "Garçom", artist: "Reginaldo Rossi", explanation: "Coração partido, bebida e música — símbolos clássicos dessa canção icônica.", hint1: "Artista: Reginaldo Rossi", hint2: "Começa com 'G' e tem 6 letras." },
@@ -35,6 +36,7 @@ export default function DesafioEmojisPage() {
   const [playerName, setPlayerName] = useState("");
   const [showHintText, setShowHintText] = useState("");
   const [scoreSaved, setScoreSaved] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -125,6 +127,26 @@ export default function DesafioEmojisPage() {
     return "Os emojis do brega te pegaram! 😂";
   };
 
+  const handleInstagramShare = async () => {
+    if (!playerName.trim()) {
+      alert('Digite seu nome primeiro para compartilhar!');
+      return;
+    }
+
+    setIsSharing(true);
+    try {
+      await shareToInstagramStory(
+        playerName,
+        score,
+        'emojis',
+        timeElapsed,
+        emojiChallenges.length * 2
+      );
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
   if (gameFinished) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6 flex items-center justify-center">
@@ -182,6 +204,14 @@ export default function DesafioEmojisPage() {
                     Jogar Novamente
                   </Button>
                 </div>
+                <Button
+                  onClick={handleInstagramShare}
+                  disabled={!playerName.trim() || isSharing}
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                >
+                  <Instagram className="w-4 h-4 mr-2" />
+                  {isSharing ? "Gerando imagem..." : "Compartilhar no Instagram"}
+                </Button>
                 <Link to={createPageUrl("Jogos")} className="flex-1">
                   <Button variant="outline" className="w-full">
                     <ArrowLeft className="w-4 h-4 mr-2" />
