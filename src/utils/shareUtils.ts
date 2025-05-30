@@ -17,7 +17,7 @@ export const shareToInstagramStory = async (
       left: -9999px;
       width: 1080px;
       height: 1920px;
-      background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+      background: radial-gradient(ellipse at center, #1a1a2e 0%, #16213e 35%, #0f0f23 100%);
       color: white;
       font-family: system-ui, -apple-system, sans-serif;
       display: flex;
@@ -29,45 +29,68 @@ export const shareToInstagramStory = async (
     `;
 
     const gameNames = {
-      'quiz': 'Quiz Brega',
-      'letras': 'Complete a Letra',
-      'emojis': 'Desafio de Emojis',
-      'timeline': 'Linha do Tempo'
+      'quiz': 'Quiz Finalizado!',
+      'letras': 'Jogo Finalizado!',
+      'emojis': 'Jogo Finalizado!',
+      'timeline': 'Jogo Finalizado!'
     };
 
     const minutes = Math.floor(completionTime / 60);
     const seconds = completionTime % 60;
     const timeFormatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    const percentage = Math.floor((score / totalQuestions) * 100);
 
     shareElement.innerHTML = `
-      <div style="text-align: center; max-width: 800px;">
-        <h1 style="font-size: 120px; margin: 0 0 40px 0; background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-          🎵 BREGA RAIZ
-        </h1>
-        <div style="background: rgba(255,255,255,0.1); border-radius: 40px; padding: 60px; margin: 40px 0; border: 2px solid rgba(255,255,255,0.2);">
-          <h2 style="font-size: 80px; margin: 0 0 30px 0; color: #4ecdc4;">
-            ${gameNames[gameType] || 'Jogo Brega'}
-          </h2>
-          <div style="font-size: 60px; margin: 30px 0; color: #ff6b6b; font-weight: bold;">
-            ${playerName}
+      <div style="text-align: center; max-width: 800px; width: 100%;">
+        <!-- Header com ícone e título -->
+        <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 60px;">
+          <div style="width: 120px; height: 120px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 30px; box-shadow: 0 0 40px rgba(139, 92, 246, 0.3);">
+            <div style="font-size: 60px;">🏆</div>
           </div>
-          <div style="display: flex; justify-content: space-around; margin: 50px 0; flex-wrap: wrap; gap: 40px;">
-            <div style="text-align: center; min-width: 200px;">
-              <div style="font-size: 100px; color: #45b7d1; font-weight: bold;">${score}</div>
-              <div style="font-size: 40px; color: #ccc;">Pontos</div>
-            </div>
-            <div style="text-align: center; min-width: 200px;">
-              <div style="font-size: 100px; color: #ff9f43; font-weight: bold;">${Math.floor((score / totalQuestions) * 100)}%</div>
-              <div style="font-size: 40px; color: #ccc;">Precisão</div>
-            </div>
-            <div style="text-align: center; min-width: 200px;">
-              <div style="font-size: 100px; color: #ff6b6b; font-weight: bold;">${timeFormatted}</div>
-              <div style="font-size: 40px; color: #ccc;">Tempo</div>
-            </div>
+          <h1 style="font-size: 72px; margin: 0; color: white; font-weight: bold;">
+            ${gameNames[gameType] || 'Jogo Finalizado!'}
+          </h1>
+        </div>
+
+        <!-- Cards de estatísticas -->
+        <div style="display: flex; justify-content: space-between; gap: 30px; margin: 60px 0; width: 100%;">
+          <div style="background: rgba(30, 30, 30, 0.8); border: 1px solid #374151; border-radius: 20px; padding: 40px; flex: 1; text-align: center; backdrop-filter: blur(10px);">
+            <div style="font-size: 64px; font-weight: bold; color: #60a5fa; margin-bottom: 10px;">${score}</div>
+            <div style="font-size: 32px; color: #9ca3af;">Pontos</div>
+          </div>
+          <div style="background: rgba(30, 30, 30, 0.8); border: 1px solid #374151; border-radius: 20px; padding: 40px; flex: 1; text-align: center; backdrop-filter: blur(10px);">
+            <div style="font-size: 64px; font-weight: bold; color: #a78bfa; margin-bottom: 10px;">${percentage}%</div>
+            <div style="font-size: 32px; color: #9ca3af;">Precisão</div>
+          </div>
+          <div style="background: rgba(30, 30, 30, 0.8); border: 1px solid #374151; border-radius: 20px; padding: 40px; flex: 1; text-align: center; backdrop-filter: blur(10px);">
+            <div style="font-size: 64px; font-weight: bold; color: #f472b6; margin-bottom: 10px;">${timeFormatted}</div>
+            <div style="font-size: 32px; color: #9ca3af;">Tempo</div>
           </div>
         </div>
-        <div style="font-size: 50px; color: #ccc; margin-top: 60px;">
-          Jogue você também! 🎮
+
+        <!-- Mensagem de performance -->
+        <div style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(99, 102, 241, 0.2)); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 30px; padding: 50px; margin: 60px 0; backdrop-filter: blur(10px);">
+          <p style="font-size: 44px; color: white; font-weight: 600; margin: 0; line-height: 1.3;">
+            ${getPerformanceMessage(percentage, gameType)} 🎯
+          </p>
+          <p style="font-size: 32px; color: #d1d5db; margin: 20px 0 0 0;">
+            Jogador: ${playerName}
+          </p>
+        </div>
+
+        <!-- Link do site -->
+        <div style="background: rgba(0, 0, 0, 0.6); border: 2px solid #f59e0b; border-radius: 25px; padding: 40px; margin: 40px 0; backdrop-filter: blur(10px);">
+          <p style="font-size: 36px; color: #fbbf24; margin: 0 0 15px 0; font-weight: bold;">🎮 Jogue você também!</p>
+          <p style="font-size: 42px; color: #fbbf24; margin: 0; font-weight: bold; letter-spacing: 1px;">
+            brega-raiz.lovable.app
+          </p>
+        </div>
+
+        <!-- Branding -->
+        <div style="margin-top: 60px;">
+          <p style="font-size: 52px; margin: 0; background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: bold;">
+            🎵 BREGA RAIZ
+          </p>
         </div>
       </div>
     `;
@@ -98,8 +121,8 @@ export const shareToInstagramStory = async (
       const file = new File([blob], 'brega-score.png', { type: 'image/png' });
       
       await navigator.share({
-        title: `Minha pontuação no ${gameNames[gameType] || 'Jogo Brega'}!`,
-        text: `Acabei de fazer ${score} pontos no ${gameNames[gameType] || 'Jogo Brega'} em ${timeFormatted}! 🎵`,
+        title: `Minha pontuação no Brega Raiz!`,
+        text: `Acabei de fazer ${score} pontos no Brega Raiz em ${timeFormatted}! 🎵\n\nJogue você também: brega-raiz.lovable.app`,
         files: [file]
       });
     } else {
@@ -114,7 +137,15 @@ export const shareToInstagramStory = async (
       URL.revokeObjectURL(url);
       
       // Mostrar instrução para o usuário
-      alert('Imagem baixada! Para compartilhar no Instagram Stories:\n1. Abra o Instagram\n2. Vá em Stories\n3. Adicione a imagem baixada\n4. Compartilhe!');
+      alert(`Imagem baixada! Para compartilhar no Instagram Stories:
+      
+1. Abra o Instagram
+2. Vá em Stories
+3. Adicione a imagem baixada
+4. Adicione um link para: brega-raiz.lovable.app
+5. Compartilhe!
+
+O link também está incluído na imagem para fácil acesso.`);
     }
 
     return true;
@@ -123,4 +154,23 @@ export const shareToInstagramStory = async (
     alert('Erro ao gerar imagem para compartilhamento. Tente novamente.');
     return false;
   }
+};
+
+const getPerformanceMessage = (percentage: number, gameType: string) => {
+  if (percentage >= 80) {
+    const messages = {
+      'quiz': 'Você é um verdadeiro expert em brega!',
+      'letras': 'Conhece todas as letras do brega!',
+      'emojis': 'Mestre dos emojis do brega!',
+      'timeline': 'Você é um mestre da história do brega!'
+    };
+    return messages[gameType] || 'Excelente performance!';
+  }
+  if (percentage >= 60) {
+    return 'Muito bem! Você conhece bastante sobre brega!';
+  }
+  if (percentage >= 40) {
+    return 'Bom trabalho! Continue estudando o brega!';
+  }
+  return 'Que tal explorar mais sobre a história do brega?';
 };
