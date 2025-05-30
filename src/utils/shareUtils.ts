@@ -17,7 +17,7 @@ export const shareToInstagramStory = async (
       left: -9999px;
       width: 1080px;
       height: 1920px;
-      background: radial-gradient(ellipse at center, #1a1a2e 0%, #16213e 35%, #0f0f23 100%);
+      background: #000000;
       color: white;
       font-family: system-ui, -apple-system, sans-serif;
       display: flex;
@@ -85,13 +85,6 @@ export const shareToInstagramStory = async (
             brega-raiz.lovable.app
           </p>
         </div>
-
-        <!-- Branding -->
-        <div style="margin-top: 60px;">
-          <p style="font-size: 52px; margin: 0; background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: bold;">
-            🎵 BREGA RAIZ
-          </p>
-        </div>
       </div>
     `;
 
@@ -102,7 +95,7 @@ export const shareToInstagramStory = async (
       width: 1080,
       height: 1920,
       scale: 1,
-      backgroundColor: null,
+      backgroundColor: '#000000',
       useCORS: true
     });
 
