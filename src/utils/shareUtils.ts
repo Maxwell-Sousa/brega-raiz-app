@@ -1,4 +1,3 @@
-
 import html2canvas from 'html2canvas';
 
 export const shareToInstagramStory = async (
@@ -82,7 +81,7 @@ export const shareToInstagramStory = async (
         <div style="background: rgba(0, 0, 0, 0.6); border: 2px solid #f59e0b; border-radius: 25px; padding: 40px; margin: 40px 0; backdrop-filter: blur(10px);">
           <p style="font-size: 36px; color: #fbbf24; margin: 0 0 15px 0; font-weight: bold;">🎮 Jogue você também!</p>
           <p style="font-size: 42px; color: #fbbf24; margin: 0; font-weight: bold; letter-spacing: 1px;">
-            brega-raiz.lovable.app
+            soabrega.vercel.app
           </p>
         </div>
       </div>
@@ -115,7 +114,7 @@ export const shareToInstagramStory = async (
       
       await navigator.share({
         title: `Minha pontuação no Brega Raiz!`,
-        text: `Acabei de fazer ${score} pontos no Brega Raiz em ${timeFormatted}! 🎵\n\nJogue você também: brega-raiz.lovable.app`,
+        text: `Acabei de fazer ${score} pontos no Brega Raiz em ${timeFormatted}! 🎵\n\nJogue você também: soabrega.vercel.app`,
         files: [file]
       });
     } else {
@@ -135,7 +134,7 @@ export const shareToInstagramStory = async (
 1. Abra o Instagram
 2. Vá em Stories
 3. Adicione a imagem baixada
-4. Adicione um link para: brega-raiz.lovable.app
+4. Adicione um link para: soabrega.vercel.app
 5. Compartilhe!
 
 O link também está incluído na imagem para fácil acesso.`);
